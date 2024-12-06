@@ -133,7 +133,6 @@ fn check_loop(map: &Matrix<MapPart>, mut pos: Position, mut dir: Direction) -> b
 		match map.get(next_pos) {
 			Some(MapPart::Wall) => {
 				if !hits.insert((pos, dir)) {
-					println!("Loop detected at {} {}, {:#?}", pos.x, pos.y, dir);
 					return true;
 				}
 				dir = dir.next();
@@ -166,10 +165,6 @@ fn solve(reader: &mut BufReader<File>) {
 			)
 			.as_str(),
 		);
-		if matches!(current_tile, MapPart::Empty) {
-			count += 1;
-			map.set(guard_position, MapPart::Visited);
-		}
 
 		let next_pos = current_direction.update_position(guard_position);
 
@@ -177,14 +172,17 @@ fn solve(reader: &mut BufReader<File>) {
 			Some(MapPart::Wall) => {
 				current_direction = current_direction.next();
 			}
-			Some(part) => {
+			Some(MapPart::Empty) => {
 				map.set(next_pos, MapPart::Wall);
 				let looped = check_loop(&map, guard_position, current_direction.next());
 				if looped {
-					println!("{} {} {}", next_pos.x, next_pos.y, looped);
 					loop_count += 1;
 				}
-				map.set(next_pos, part);
+				map.set(next_pos, MapPart::Visited);
+				guard_position = next_pos;
+				count += 1;
+			}
+			Some(MapPart::Visited) => {
 				guard_position = next_pos;
 			}
 			None => {
