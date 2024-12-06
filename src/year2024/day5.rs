@@ -1,13 +1,8 @@
-use core::panic;
-use std::{
-	collections::HashMap,
-	fs::File,
-	io::{BufRead, BufReader, Seek},
-};
+use std::io::{BufRead, Seek};
 
-fn part_1(reader: &mut BufReader<File>) {
+fn part_1<R: BufRead>(reader: &mut R) -> usize {
 	let mut is_order = true;
-	let mut count: u32 = 0;
+	let mut count = 0;
 	let mut ordering = vec![vec![false; 100]; 100];
 
 	'lines: for line in reader.lines() {
@@ -47,13 +42,13 @@ fn part_1(reader: &mut BufReader<File>) {
 			}
 		}
 
-		count += pages[pages.len() / 2] as u32;
+		count += pages[pages.len() / 2];
 	}
 
-	println!("{}", count);
+	return count;
 }
 
-fn part_2(reader: &mut BufReader<File>) {
+fn part_2<R: BufRead>(reader: &mut R) -> usize {
 	let mut is_order = true;
 	let mut ordering = vec![vec![false; 100]; 100];
 	let mut count = 0;
@@ -105,16 +100,15 @@ fn part_2(reader: &mut BufReader<File>) {
 		}
 	}
 
-	println!("{}", count);
+	return count;
 }
 
-fn main() {
-	let file = File::open("input.txt").expect("Unable to open file");
-	let mut reader = BufReader::new(file);
-
-	part_1(&mut reader);
+pub fn solve<R: BufRead + Seek>(reader: &mut R) -> (i64, i64) {
+	let p1 = part_1(reader);
 
 	reader.rewind().expect("Unable to rewind");
 
-	part_2(&mut reader);
+	let p2 = part_2(reader);
+
+	(p1 as i64, p2 as i64)
 }

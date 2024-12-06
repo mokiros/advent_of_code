@@ -1,8 +1,4 @@
-use core::panic;
-use std::{
-	fs::File,
-	io::{BufRead, BufReader, Seek},
-};
+use std::io::{BufRead, Seek};
 
 struct Matrix {
 	data: Vec<u8>,
@@ -28,7 +24,7 @@ impl Matrix {
 	}
 }
 
-fn part_1(reader: &mut BufReader<File>) {
+fn part_1<R: BufRead>(reader: &mut R) -> i32 {
 	let lines_iter = reader.lines();
 	let mut data: Vec<u8> = Vec::with_capacity(140 * 140);
 
@@ -69,10 +65,10 @@ fn part_1(reader: &mut BufReader<File>) {
 		}
 	}
 
-	println!("{}", count);
+	return count;
 }
 
-fn part_2(reader: &mut BufReader<File>) {
+fn part_2<R: BufRead>(reader: &mut R) -> i32 {
 	let lines_iter = reader.lines();
 	let mut data: Vec<u8> = Vec::with_capacity(140 * 140);
 
@@ -110,16 +106,15 @@ fn part_2(reader: &mut BufReader<File>) {
 		}
 	}
 
-	println!("{}", count);
+	return count;
 }
 
-fn main() {
-	let file = File::open("input.txt").expect("Unable to open file");
-	let mut reader = BufReader::new(file);
-
-	part_1(&mut reader);
+pub fn solve<R: BufRead + Seek>(reader: &mut R) -> (i64, i64) {
+	let p1 = part_1(reader);
 
 	reader.rewind().expect("Unable to rewind");
 
-	part_2(&mut reader);
+	let p2 = part_2(reader);
+
+	(p1 as i64, p2 as i64)
 }

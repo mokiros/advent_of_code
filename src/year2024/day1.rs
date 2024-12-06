@@ -1,10 +1,9 @@
 use std::{
 	collections::HashMap,
-	fs::File,
-	io::{BufRead, BufReader, Seek},
+	io::{BufRead, Seek},
 };
 
-fn part_1(reader: &mut BufReader<File>) {
+fn part_1<R: BufRead>(reader: &mut R) -> i32 {
 	let mut x_values = Vec::new();
 	let mut y_values = Vec::new();
 
@@ -36,10 +35,10 @@ fn part_1(reader: &mut BufReader<File>) {
 		sum += (x - y).abs();
 	}
 
-	println!("{}", sum);
+	return sum;
 }
 
-fn part_2(reader: &mut BufReader<File>) {
+fn part_2<R: BufRead>(reader: &mut R) -> i32 {
 	let mut values: Vec<i32> = Vec::new();
 	let mut frequency: HashMap<i32, i32> = HashMap::new();
 
@@ -68,16 +67,15 @@ fn part_2(reader: &mut BufReader<File>) {
 		sum += x * y;
 	}
 
-	println!("{}", sum);
+	return sum;
 }
 
-fn main() {
-	let file = File::open("input.txt").expect("Unable to open file");
-	let mut reader = BufReader::new(file);
-
-	part_1(&mut reader);
+pub fn solve<R: BufRead + Seek>(reader: &mut R) -> (i64, i64) {
+	let p1 = part_1(reader);
 
 	reader.rewind().expect("Unable to rewind");
 
-	part_2(&mut reader);
+	let p2 = part_2(reader);
+
+	(p1 as i64, p2 as i64)
 }

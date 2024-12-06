@@ -1,9 +1,7 @@
-use std::fs;
+use std::io::{BufRead, Seek};
 
-use regex::Regex;
-
-fn part_1(file: &str) {
-	let re = Regex::new(r"mul\((\d+),(\d+)\)");
+fn part_1(file: &str) -> i32 {
+	let re = regex::Regex::new(r"mul\((\d+),(\d+)\)");
 
 	let mut count = 0;
 
@@ -14,11 +12,11 @@ fn part_1(file: &str) {
 		count += x * y;
 	}
 
-	println!("{}", count);
+	return count;
 }
 
-fn part_2(file: &str) {
-	let re = Regex::new(r"(mul|do|don't)\(((\d+),(\d+))?\)");
+fn part_2(file: &str) -> i32 {
+	let re = regex::Regex::new(r"(mul|do|don't)\(((\d+),(\d+))?\)");
 
 	let mut count = 0;
 
@@ -41,13 +39,15 @@ fn part_2(file: &str) {
 		}
 	}
 
-	println!("{}", count);
+	return count;
 }
 
-fn main() {
-	let file = fs::read_to_string("input.txt").expect("Unable to read file");
+pub fn solve<R: BufRead + Seek>(reader: &mut R) -> (i64, i64) {
+	let mut file = String::new();
+	reader.read_to_string(&mut file).unwrap();
 
-	part_1(file.as_str());
+	let p1 = part_1(&file);
+	let p2 = part_2(&file);
 
-	part_2(file.as_str());
+	(p1 as i64, p2 as i64)
 }

@@ -1,7 +1,6 @@
 use std::{
-	collections::{HashMap, HashSet},
-	fs::File,
-	io::{BufRead, BufReader, Read},
+	collections::HashSet,
+	io::{BufRead, Seek},
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -91,7 +90,7 @@ impl Direction {
 	}
 }
 
-fn read_map<R: Read>(reader: &mut BufReader<R>) -> (Matrix<MapPart>, Position) {
+fn read_map<R: BufRead>(reader: &mut R) -> (Matrix<MapPart>, Position) {
 	let mut width: u8 = 0;
 	let mut height: u8 = 0;
 	let mut data: Vec<MapPart> = Vec::new();
@@ -149,7 +148,7 @@ fn check_loop(map: &Matrix<MapPart>, mut pos: Position, mut dir: Direction) -> b
 	panic!("loop check: Did not reach the edge of the map");
 }
 
-fn solve(reader: &mut BufReader<File>) {
+pub fn solve<R: BufRead + Seek>(reader: &mut R) -> (i64, i64) {
 	let (mut map, mut guard_position) = read_map(reader);
 
 	let mut current_direction = Direction::Top;
@@ -158,14 +157,6 @@ fn solve(reader: &mut BufReader<File>) {
 	let mut loop_count = 0;
 
 	for _ in 0..(map.width as usize * map.height as usize) {
-		let current_tile = map.get(guard_position).expect(
-			format!(
-				"Guard is at the edge {} {}",
-				guard_position.x, guard_position.y
-			)
-			.as_str(),
-		);
-
 		let next_pos = current_direction.update_position(guard_position);
 
 		match map.get(next_pos) {
@@ -186,18 +177,10 @@ fn solve(reader: &mut BufReader<File>) {
 				guard_position = next_pos;
 			}
 			None => {
-				println!("Part 1: {}\nPart 2: {}", count, loop_count);
-				return;
+				return (count, loop_count);
 			}
 		}
 	}
 
 	panic!("Did not reach the edge of the map");
-}
-
-fn main() {
-	let file = File::open("input.txt").expect("Unable to open file");
-	let mut reader = BufReader::new(file);
-
-	solve(&mut reader);
 }

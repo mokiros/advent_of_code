@@ -1,2 +1,2 @@
-input.txt
-output.txt
+/target
+/input/**/*.txt
