@@ -31,6 +31,7 @@ fn run(year: u16, day: u8, input: Option<String>) -> Result<(), ()> {
 		(2024, 5) => year2024::day5::solve,
 		(2024, 6) => year2024::day6::solve,
 		(2024, 7) => year2024::day7::solve,
+		(2024, 8) => year2024::day8::solve,
 		_ => return Err(()),
 	};
 
