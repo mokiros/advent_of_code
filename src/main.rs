@@ -58,12 +58,16 @@ fn main() {
 
 	let days = match args.day {
 		Some(day) => day..=day,
-		None => 1..=7,
+		None => 1..=25,
 	};
 
 	for year in years {
 		for day in days.clone() {
-			let _ = run(year, day, args.input.clone());
+			let result = run(year, day, args.input.clone());
+
+			if result.is_err() {
+				return;
+			}
 		}
 	}
 }
