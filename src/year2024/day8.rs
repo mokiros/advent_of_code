@@ -9,7 +9,7 @@ struct Position {
 	y: i8,
 }
 
-pub fn solve<R: BufRead + Seek>(reader: &mut R) -> (i64, i64) {
+pub fn solve<R: BufRead + Seek>(reader: R) -> (i64, i64) {
 	let mut width: i8 = 0;
 	let mut height: i8 = 0;
 

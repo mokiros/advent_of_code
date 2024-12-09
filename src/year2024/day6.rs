@@ -148,8 +148,8 @@ fn check_loop(map: &Matrix<MapPart>, mut pos: Position, mut dir: Direction) -> b
 	panic!("loop check: Did not reach the edge of the map");
 }
 
-pub fn solve<R: BufRead + Seek>(reader: &mut R) -> (i64, i64) {
-	let (mut map, mut guard_position) = read_map(reader);
+pub fn solve<R: BufRead + Seek>(mut reader: R) -> (i64, i64) {
+	let (mut map, mut guard_position) = read_map(&mut reader);
 
 	let mut current_direction = Direction::Top;
 

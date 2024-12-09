@@ -109,12 +109,12 @@ fn part_2<R: BufRead>(reader: &mut R) -> i32 {
 	return count;
 }
 
-pub fn solve<R: BufRead + Seek>(reader: &mut R) -> (i64, i64) {
-	let p1 = part_1(reader);
+pub fn solve<R: BufRead + Seek>(mut reader: R) -> (i64, i64) {
+	let p1 = part_1(&mut reader);
 
 	reader.rewind().expect("Unable to rewind");
 
-	let p2 = part_2(reader);
+	let p2 = part_2(&mut reader);
 
 	(p1 as i64, p2 as i64)
 }

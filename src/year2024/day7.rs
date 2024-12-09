@@ -41,7 +41,7 @@ fn count_numbers_binary(numbers: &Vec<i64>, bits: u16) -> i64 {
 	count
 }
 
-pub fn solve<R: BufRead + Seek>(reader: &mut R) -> (i64, i64) {
+pub fn solve<R: BufRead + Seek>(reader: R) -> (i64, i64) {
 	let mut p1: i64 = 0;
 	let mut p2: i64 = 0;
 

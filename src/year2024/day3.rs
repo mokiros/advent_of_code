@@ -42,7 +42,7 @@ fn part_2(file: &str) -> i32 {
 	return count;
 }
 
-pub fn solve<R: BufRead + Seek>(reader: &mut R) -> (i64, i64) {
+pub fn solve<R: BufRead + Seek>(mut reader: R) -> (i64, i64) {
 	let mut file = String::new();
 	reader.read_to_string(&mut file).unwrap();
 

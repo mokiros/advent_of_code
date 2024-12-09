@@ -21,9 +21,9 @@ fn run(year: u16, day: u8, input: Option<String>) -> Result<(), ()> {
 	let input_path = input.unwrap_or(format!("./input/{}/{}.txt", year, day));
 
 	let file = File::open(input_path).expect("Unable to open file");
-	let mut reader = BufReader::new(file);
+	let reader = BufReader::new(file);
 
-	let solve: fn(&mut BufReader<File>) -> (i64, i64) = match (year, day) {
+	let solve: fn(BufReader<File>) -> (i64, i64) = match (year, day) {
 		(2024, 1) => year2024::day1::solve,
 		(2024, 2) => year2024::day2::solve,
 		(2024, 3) => year2024::day3::solve,
@@ -32,12 +32,13 @@ fn run(year: u16, day: u8, input: Option<String>) -> Result<(), ()> {
 		(2024, 6) => year2024::day6::solve,
 		(2024, 7) => year2024::day7::solve,
 		(2024, 8) => year2024::day8::solve,
+		(2024, 9) => year2024::day9::solve,
 		_ => return Err(()),
 	};
 
 	let now = Instant::now();
 
-	let (part_1, part_2) = solve(&mut reader);
+	let (part_1, part_2) = solve(reader);
 
 	let elapsed = now.elapsed();
 
