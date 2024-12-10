@@ -100,8 +100,10 @@ pub fn solve<R: BufRead + Seek>(mut reader: R) -> (i64, i64) {
 				}
 			}
 
+			let temp = endpoints;
 			endpoints = next_endpoints;
-			next_endpoints = Vec::new();
+			next_endpoints = temp;
+			next_endpoints.clear();
 		}
 
 		if endpoints.len() > 0 {
