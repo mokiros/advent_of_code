@@ -5,14 +5,6 @@ use std::{
 
 use crate::util::matrix::Matrix;
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
-enum Direction {
-	Up,
-	Down,
-	Left,
-	Right,
-}
-
 fn calculate_area(
 	map: &mut Matrix<Option<char>>,
 	start_x: isize,
