@@ -64,7 +64,7 @@ fn calculate_area(
 	(area * edges_num, area * angles)
 }
 
-pub fn solve<R: BufRead + Seek>(mut reader: R) -> (i64, i64) {
+pub fn solve<R: BufRead + Seek>(reader: R) -> (i64, i64) {
 	let mut data: Vec<Option<char>> = Vec::new();
 	let mut width: u8 = 0;
 	let mut height: u8 = 0;
