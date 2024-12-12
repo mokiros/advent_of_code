@@ -1,28 +1,6 @@
 use std::io::{BufRead, Seek};
 
-struct Matrix {
-	data: Vec<u8>,
-	width: u16,
-	height: u16,
-}
-
-impl Matrix {
-	fn new(width: u16, height: u16, data: Vec<u8>) -> Self {
-		Self {
-			data,
-			width,
-			height,
-		}
-	}
-
-	fn get(&self, x: isize, y: isize) -> Option<u8> {
-		if x < self.width as isize && y < self.height as isize && x >= 0 && y >= 0 {
-			Some(self.data[((y as u16) * self.width + (x as u16)) as usize])
-		} else {
-			None
-		}
-	}
-}
+use crate::util::matrix::Matrix;
 
 fn part_1<R: BufRead>(reader: &mut R) -> i32 {
 	let lines_iter = reader.lines();
