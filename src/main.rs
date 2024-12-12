@@ -2,6 +2,7 @@ use std::{fs::File, io::BufReader, time::Instant};
 
 use clap::Parser;
 
+mod util;
 mod year2024;
 
 #[derive(Parser, Debug)]
