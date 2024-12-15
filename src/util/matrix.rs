@@ -1,7 +1,8 @@
+#[derive(Debug, Clone)]
 pub struct Matrix<T> {
 	pub width: u8,
 	pub height: u8,
-	data: Vec<T>,
+	pub data: Vec<T>,
 }
 
 impl<T: Copy> Matrix<T> {
