@@ -28,6 +28,10 @@ impl<T: Copy> Matrix<T> {
 		self.get_idx(x, y).map(|idx| self.data[idx])
 	}
 
+	pub fn get_mut(&mut self, x: isize, y: isize) -> Option<&mut T> {
+		self.get_idx(x, y).map(|idx| &mut self.data[idx])
+	}
+
 	pub fn set(&mut self, x: isize, y: isize, value: T) {
 		if let Some(idx) = self.get_idx(x, y) {
 			self.data[idx] = value;
