@@ -1,3 +1,5 @@
+#![feature(iter_array_chunks)]
+
 use std::{fs::File, io::BufReader, time::Instant};
 
 use clap::Parser;
@@ -38,6 +40,7 @@ fn run(year: u16, day: u8, input: Option<String>) -> Result<(), ()> {
 		(2024, 14) => year2024::day14::solve,
 		(2024, 15) => year2024::day15::solve,
 		(2024, 16) => year2024::day16::solve,
+		(2024, 17) => year2024::day17::solve,
 		_ => return Err(()),
 	};
 
