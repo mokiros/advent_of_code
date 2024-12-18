@@ -39,4 +39,15 @@ impl<T: Copy> Matrix<T> {
 			panic!("Matrix index out of bounds: {} {}", x, y)
 		}
 	}
+
+	pub fn to_string(&self, char_fn: fn(element: &T) -> char) -> String {
+		let mut s = String::with_capacity(self.width as usize * self.height as usize);
+		for y in 0..self.height {
+			for x in 0..self.width {
+				s.push(char_fn(&self.get(x as isize, y as isize).unwrap()));
+			}
+			s.push('\n');
+		}
+		s
+	}
 }
