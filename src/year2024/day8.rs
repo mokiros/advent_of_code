@@ -46,10 +46,7 @@ pub fn solve<R: BufRead + Seek>(reader: R) -> (i64, i64) {
 
 				let dx = p1.x - p2.x;
 				let dy = p1.y - p2.y;
-				let mut p3 = Position {
-					x: p1.x,
-					y: p1.y,
-				};
+				let mut p3 = Position { x: p1.x, y: p1.y };
 
 				let mut i = 0;
 				while !(p3.x < 1 || p3.x > width || p3.y < 1 || p3.y > height) {

@@ -30,7 +30,7 @@ fn bfs(map: &Matrix<u16>, iteration: u16) -> Option<usize> {
 		}
 
 		for direction in Direction::all() {
-			let next_pos = direction.update_position(pos);
+			let next_pos = direction.update_position(&pos);
 
 			let is_wall = map.get(next_pos.x, next_pos.y).unwrap_or(0) < iteration;
 			let is_visited = visited.get(next_pos.x, next_pos.y).unwrap_or(true);

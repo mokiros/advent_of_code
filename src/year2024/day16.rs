@@ -70,7 +70,7 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 			let left = direction.previous();
 			let right = direction.next();
 			let next = [
-				(direction.update_position(position), direction, cost + 1),
+				(direction.update_position(&position), direction, cost + 1),
 				(position, left, cost + 1000),
 				(position, right, cost + 1000),
 			];
@@ -116,7 +116,7 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 		let right = direction.next();
 		let next = [
 			(
-				direction.opposite().update_position(position),
+				direction.opposite().update_position(&position),
 				direction,
 				cost - 1,
 			),

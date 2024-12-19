@@ -11,29 +11,6 @@ enum MapPart {
 	RightBox,
 }
 
-fn print_map(map: &Matrix<MapPart>, robot_pos: &Position) {
-	for y in 0..map.height {
-		for x in 0..map.width {
-			if x as isize == robot_pos.x && y as isize == robot_pos.y {
-				print!("@");
-				continue;
-			}
-			print!(
-				"{}",
-				match map.get(x as isize, y as isize) {
-					Some(MapPart::Wall) => '#',
-					Some(MapPart::Box) => 'O',
-					Some(MapPart::Empty) => '.',
-					Some(MapPart::LeftBox) => '[',
-					Some(MapPart::RightBox) => ']',
-					None => ' ',
-				}
-			);
-		}
-		println!();
-	}
-}
-
 fn part_1(
 	map: &Matrix<MapPart>,
 	mut robot_pos: Position,
@@ -45,7 +22,7 @@ fn part_1(
 		let mut stacks = 0;
 		let mut current_pos = robot_pos;
 		loop {
-			current_pos = dir.update_position(current_pos);
+			current_pos = dir.update_position(&current_pos);
 			match map.get(current_pos.x, current_pos.y) {
 				Some(MapPart::Empty) => {
 					break;
@@ -64,7 +41,7 @@ fn part_1(
 			}
 		}
 
-		let next_pos = dir.update_position(robot_pos);
+		let next_pos = dir.update_position(&robot_pos);
 
 		if stacks >= 0 {
 			robot_pos = next_pos;
@@ -120,7 +97,7 @@ fn part_2(
 			dir: Direction,
 			current_pos: Position,
 		) -> bool {
-			let next_pos = dir.update_position(current_pos);
+			let next_pos = dir.update_position(&current_pos);
 			let check_move = match (dir, map.get(next_pos.x, next_pos.y)) {
 				(
 					Direction::Left | Direction::Right,
@@ -128,11 +105,11 @@ fn part_2(
 				) => can_move(map, queue, dir, next_pos),
 				(_, Some(MapPart::LeftBox)) => {
 					can_move(map, queue, dir, next_pos)
-						&& can_move(map, queue, dir, Direction::Right.update_position(next_pos))
+						&& can_move(map, queue, dir, Direction::Right.update_position(&next_pos))
 				}
 				(_, Some(MapPart::RightBox)) => {
 					can_move(map, queue, dir, next_pos)
-						&& can_move(map, queue, dir, Direction::Left.update_position(next_pos))
+						&& can_move(map, queue, dir, Direction::Left.update_position(&next_pos))
 				}
 				(_, Some(MapPart::Empty)) => true,
 				_ => false,
@@ -149,7 +126,7 @@ fn part_2(
 		}
 
 		if can_move(&map, &mut queue, *dir, robot_pos) {
-			robot_pos = dir.update_position(robot_pos);
+			robot_pos = dir.update_position(&robot_pos);
 			for (pos, part) in queue.iter() {
 				map.set(pos.x, pos.y, *part);
 			}

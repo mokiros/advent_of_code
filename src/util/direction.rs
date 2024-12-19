@@ -27,7 +27,7 @@ impl Direction {
 		}
 	}
 
-	pub fn update_position(&self, pos: Position) -> Position {
+	pub fn update_position(&self, pos: &Position) -> Position {
 		match self {
 			Self::Up => Position {
 				x: pos.x,

@@ -3,91 +3,13 @@ use std::{
 	io::{BufRead, Seek},
 };
 
+use crate::util::{direction::Direction, matrix::Matrix, position::Position};
+
 #[derive(Debug, Clone, Copy)]
 enum MapPart {
 	Empty,
 	Wall,
 	Visited,
-}
-
-struct Matrix<T> {
-	width: u8,
-	height: u8,
-	data: Vec<T>,
-}
-
-impl<T: Copy> Matrix<T> {
-	fn new(width: u8, height: u8, data: Vec<T>) -> Self {
-		Self {
-			data,
-			width,
-			height,
-		}
-	}
-
-	fn get(&self, pos: Position) -> Option<T> {
-		if pos.x <= self.width && pos.y <= self.height && pos.x > 0 && pos.y > 0 {
-			let idx = (pos.y - 1) as usize * self.width as usize + (pos.x - 1) as usize;
-			Some(self.data[idx])
-		} else {
-			None
-		}
-	}
-
-	fn set(&mut self, pos: Position, value: T) {
-		if pos.x <= self.width && pos.y <= self.height && pos.x > 0 && pos.y > 0 {
-			let idx = (pos.y - 1) as usize * self.width as usize + (pos.x - 1) as usize;
-			self.data[idx as usize] = value;
-		} else {
-			panic!("Matrix index out of bounds: {} {}", pos.x, pos.y)
-		}
-	}
-}
-
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
-struct Position {
-	x: u8,
-	y: u8,
-}
-
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
-enum Direction {
-	Top,
-	Right,
-	Bottom,
-	Left,
-}
-
-impl Direction {
-	fn next(&self) -> Self {
-		match self {
-			Self::Top => Self::Right,
-			Self::Right => Self::Bottom,
-			Self::Bottom => Self::Left,
-			Self::Left => Self::Top,
-		}
-	}
-
-	fn update_position(&self, pos: Position) -> Position {
-		match self {
-			Self::Top => Position {
-				x: pos.x,
-				y: pos.y - 1,
-			},
-			Self::Right => Position {
-				x: pos.x + 1,
-				y: pos.y,
-			},
-			Self::Bottom => Position {
-				x: pos.x,
-				y: pos.y + 1,
-			},
-			Self::Left => Position {
-				x: pos.x - 1,
-				y: pos.y,
-			},
-		}
-	}
 }
 
 fn read_map<R: BufRead>(reader: &mut R) -> (Matrix<MapPart>, Position) {
@@ -106,8 +28,8 @@ fn read_map<R: BufRead>(reader: &mut R) -> (Matrix<MapPart>, Position) {
 				'.' => MapPart::Empty,
 				'^' => {
 					guard_position = Some(Position {
-						x: x as u8 + 1,
-						y: y as u8 + 1,
+						x: x as isize,
+						y: y as isize,
 					});
 					MapPart::Empty
 				}
@@ -127,9 +49,9 @@ fn check_loop(map: &Matrix<MapPart>, mut pos: Position, mut dir: Direction) -> b
 	let mut hits: HashSet<(Position, Direction)> = HashSet::new();
 
 	for _ in 0..(map.width as usize * map.height as usize) {
-		let next_pos = dir.update_position(pos);
+		let next_pos = dir.update_position(&pos);
 
-		match map.get(next_pos) {
+		match map.get(next_pos.x, next_pos.y) {
 			Some(MapPart::Wall) => {
 				if !hits.insert((pos, dir)) {
 					return true;
@@ -151,25 +73,25 @@ fn check_loop(map: &Matrix<MapPart>, mut pos: Position, mut dir: Direction) -> b
 pub fn solve<R: BufRead + Seek>(mut reader: R) -> (i64, i64) {
 	let (mut map, mut guard_position) = read_map(&mut reader);
 
-	let mut current_direction = Direction::Top;
+	let mut current_direction = Direction::Up;
 
 	let mut count = 0;
 	let mut loop_count = 0;
 
 	for _ in 0..(map.width as usize * map.height as usize) {
-		let next_pos = current_direction.update_position(guard_position);
+		let next_pos = current_direction.update_position(&guard_position);
 
-		match map.get(next_pos) {
+		match map.get(next_pos.x, next_pos.y) {
 			Some(MapPart::Wall) => {
 				current_direction = current_direction.next();
 			}
 			Some(MapPart::Empty) => {
-				map.set(next_pos, MapPart::Wall);
+				map.set(next_pos.x, next_pos.y, MapPart::Wall);
 				let looped = check_loop(&map, guard_position, current_direction.next());
 				if looped {
 					loop_count += 1;
 				}
-				map.set(next_pos, MapPart::Visited);
+				map.set(next_pos.x, next_pos.y, MapPart::Visited);
 				guard_position = next_pos;
 				count += 1;
 			}
