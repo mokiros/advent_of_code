@@ -1,3 +1,7 @@
+use std::io::BufRead;
+
+use super::position::Position;
+
 #[derive(Debug, Clone)]
 pub struct Matrix<T> {
 	pub width: u8,
@@ -12,6 +16,47 @@ impl<T: Copy> Matrix<T> {
 			width,
 			height,
 		}
+	}
+
+	pub fn read_map_with_start_and_end<R: BufRead>(reader: R, char_fn: fn(char: char) -> T) -> (Matrix<T>, Position, Position) {
+		let mut start_position: Option<Position> = Some(Position { x: 0, y: 0 });
+		let mut end_position: Option<Position> = Some(Position { x: 0, y: 0 });
+
+		let mut data: Vec<T> = Vec::new();
+		let mut width = 0;
+		let mut height = 0;
+
+		for line in reader.lines() {
+			let line = line.unwrap();
+			width = 0;
+			height += 1;
+
+			for char in line.chars() {
+				width += 1;
+				data.push(char_fn(char));
+				match char {
+					'S' => {
+						start_position = Some(Position {
+							x: width - 1,
+							y: height - 1,
+						})
+					}
+					'E' => {
+						end_position = Some(Position {
+							x: width - 1,
+							y: height - 1,
+						})
+					}
+					_ => (),
+				}
+			}
+		}
+
+		(
+			Matrix::new(width as u8, height as u8, data),
+			start_position.unwrap(),
+			end_position.unwrap(),
+		)
 	}
 
 	fn get_idx(&self, x: isize, y: isize) -> Option<usize> {
