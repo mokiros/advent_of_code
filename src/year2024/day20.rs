@@ -2,7 +2,7 @@ use std::{collections::HashMap, io::BufRead};
 
 use crate::util::{direction::Direction, matrix::Matrix, position::Position};
 
-pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
+pub fn solve<R: BufRead>(reader: R) -> (String, String) {
 	let (map, start_pos, end_pos) = Matrix::read_map_with_start_and_end(reader, |c| c == '#');
 
 	let mut costs: HashMap<Position, isize> = HashMap::new();
@@ -35,7 +35,7 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 		for y in -MAX_DISTANCE..=MAX_DISTANCE {
 			let pos = Position { x, y };
 			let total_distance = pos.manhattan_length();
-			if total_distance >= 2 && total_distance <= MAX_DISTANCE {
+			if (2..=MAX_DISTANCE).contains(&total_distance) {
 				lookup.push(pos);
 			}
 		}
@@ -47,12 +47,12 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 	const MIN_SAVE: isize = 100;
 
 	// applying the lookup above to every position on the path
-	for (pos, cost) in costs.iter() {
+	for (pos, cost) in &costs {
 		// No point in checking last 100 tiles of the path
 		if path_length - cost < MIN_SAVE {
 			continue;
 		}
-		for vec in lookup.iter() {
+		for vec in &lookup {
 			let next_pos = pos + vec;
 			let vec_distance = vec.manhattan_length();
 			if let Some(new_cost) = costs.get(&next_pos) {
@@ -67,5 +67,5 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 		}
 	}
 
-	(p1, p2)
+	(p1.to_string(), p2.to_string())
 }

@@ -63,20 +63,20 @@ pub struct Position {
 }
 
 impl Position {
-	pub fn new(x: isize, y: isize) -> Self {
+	pub const fn new(x: isize, y: isize) -> Self {
 		Self { x, y }
 	}
 
-	pub fn manhattan_length(&self) -> isize {
+	pub const fn manhattan_length(&self) -> isize {
 		self.x.abs() + self.y.abs()
 	}
 
-	pub fn manhattan_distance(&self, other: &Position) -> isize {
+	pub fn manhattan_distance(&self, other: &Self) -> isize {
 		(self - other).manhattan_length()
 	}
 }
 
-impl Add<Position> for Position {
+impl Add<Self> for Position {
 	type Output = Self;
 
 	#[inline]

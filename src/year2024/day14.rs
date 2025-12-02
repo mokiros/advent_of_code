@@ -1,16 +1,16 @@
 use std::io::BufRead;
 
-pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
+const SECONDS: i64 = 100;
+const EASTER_EGG_SECONDS: i64 = 30000;
+const TILES_X: i64 = 101;
+const TILES_Y: i64 = 103;
+const TILES_X_HALF: i64 = TILES_X / 2;
+const TILES_Y_HALF: i64 = TILES_Y / 2;
+
+pub fn solve<R: BufRead>(reader: R) -> (String, String) {
 	let re = regex::Regex::new(r"(-?\d+)").unwrap();
 
 	let mut quadrants: [i64; 4] = [0, 0, 0, 0];
-
-	const SECONDS: i64 = 100;
-	const EASTER_EGG_SECONDS: i64 = 30000;
-	const TILES_X: i64 = 101;
-	const TILES_Y: i64 = 103;
-	const TILES_X_HALF: i64 = TILES_X / 2;
-	const TILES_Y_HALF: i64 = TILES_Y / 2;
 
 	let mut robots: Vec<(i64, i64, i64, i64)> = Vec::new();
 
@@ -44,15 +44,15 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 	let mut p2 = -1;
 
 	'map_loop: for i in 0..EASTER_EGG_SECONDS {
-		let mut map = vec![false; TILES_X as usize * TILES_Y as usize];
+		let mut map = vec![false; usize::try_from(TILES_X * TILES_Y).unwrap()];
 
-		for j in 0..robots.len() {
-			let (x, y, vx, vy) = robots[j];
+		for robot in &robots {
+			let (x, y, vx, vy) = robot;
 
 			let end_x = (x + vx * i).rem_euclid(TILES_X);
 			let end_y = (y + vy * i).rem_euclid(TILES_Y);
 
-			map[end_y as usize * TILES_X as usize + end_x as usize] = true;
+			map[usize::try_from(end_y * TILES_X + end_x).unwrap()] = true;
 		}
 
 		let mut repeats = 0;
@@ -69,5 +69,8 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 		}
 	}
 
-	(quadrants.iter().fold(1, |a, b| a * b), p2)
+	(
+		quadrants.iter().product::<i64>().to_string(),
+		p2.to_string(),
+	)
 }

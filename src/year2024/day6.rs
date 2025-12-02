@@ -19,7 +19,7 @@ fn read_map<R: BufRead>(reader: &mut R) -> (Matrix<MapPart>, Position) {
 	let mut guard_position: Option<Position> = None;
 	for (y, line) in reader.lines().enumerate() {
 		let line = line.unwrap();
-		width = line.len() as u8;
+		width = u8::try_from(line.len()).unwrap();
 		height += 1;
 
 		for (x, char) in line.chars().enumerate() {
@@ -28,12 +28,12 @@ fn read_map<R: BufRead>(reader: &mut R) -> (Matrix<MapPart>, Position) {
 				'.' => MapPart::Empty,
 				'^' => {
 					guard_position = Some(Position {
-						x: x as isize,
-						y: y as isize,
+						x: x.cast_signed(),
+						y: y.cast_signed(),
 					});
 					MapPart::Empty
 				}
-				_ => panic!("Invalid map character: {}", char),
+				_ => panic!("Invalid map character: {char}"),
 			};
 			data.push(part);
 		}
@@ -70,7 +70,7 @@ fn check_loop(map: &Matrix<MapPart>, mut pos: Position, mut dir: Direction) -> b
 	panic!("loop check: Did not reach the edge of the map");
 }
 
-pub fn solve<R: BufRead + Seek>(mut reader: R) -> (i64, i64) {
+pub fn solve<R: BufRead + Seek>(mut reader: R) -> (String, String) {
 	let (mut map, mut guard_position) = read_map(&mut reader);
 
 	let mut current_direction = Direction::Up;
@@ -99,7 +99,7 @@ pub fn solve<R: BufRead + Seek>(mut reader: R) -> (i64, i64) {
 				guard_position = next_pos;
 			}
 			None => {
-				return (count, loop_count);
+				return (count.to_string(), loop_count.to_string());
 			}
 		}
 	}

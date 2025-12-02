@@ -1,6 +1,6 @@
 use std::io::BufRead;
 
-pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
+pub fn solve<R: BufRead>(reader: R) -> (String, String) {
 	let mut lines = reader.lines();
 
 	let mut keys = Vec::new();
@@ -42,5 +42,5 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 		}
 	}
 
-	return (p1, 0);
+	(p1.to_string(), 0.to_string())
 }

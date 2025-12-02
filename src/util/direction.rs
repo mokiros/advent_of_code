@@ -8,8 +8,9 @@ pub enum Direction {
 	Left,
 }
 
+#[allow(unused)]
 impl Direction {
-	pub fn next(&self) -> Self {
+	pub const fn next(self) -> Self {
 		match self {
 			Self::Up => Self::Right,
 			Self::Right => Self::Down,
@@ -18,7 +19,7 @@ impl Direction {
 		}
 	}
 
-	pub fn previous(&self) -> Self {
+	pub const fn previous(self) -> Self {
 		match self {
 			Self::Up => Self::Left,
 			Self::Right => Self::Up,
@@ -27,7 +28,7 @@ impl Direction {
 		}
 	}
 
-	pub fn update_position(&self, pos: &Position) -> Position {
+	pub const fn update_position(self, pos: &Position) -> Position {
 		match self {
 			Self::Up => Position {
 				x: pos.x,
@@ -48,7 +49,7 @@ impl Direction {
 		}
 	}
 
-	pub fn opposite(&self) -> Self {
+	pub const fn opposite(self) -> Self {
 		match self {
 			Self::Up => Self::Down,
 			Self::Right => Self::Left,
@@ -57,29 +58,24 @@ impl Direction {
 		}
 	}
 
-	pub fn orthogonal(&self) -> (Self, Self) {
+	pub const fn orthogonal(self) -> (Self, Self) {
 		match self {
 			Self::Up | Self::Down => (Self::Left, Self::Right),
 			Self::Left | Self::Right => (Self::Up, Self::Down),
 		}
 	}
 
-	pub fn distance(&self, other_direction: &Direction) -> u8 {
+	pub fn distance(self, other_direction: Self) -> u8 {
 		if self == other_direction {
 			0
-		} else if self.opposite() == *other_direction {
+		} else if self.opposite() == other_direction {
 			2
 		} else {
 			1
 		}
 	}
 
-	pub fn all() -> Vec<Direction> {
-		vec![
-			Direction::Up,
-			Direction::Right,
-			Direction::Down,
-			Direction::Left,
-		]
+	pub fn all() -> Vec<Self> {
+		vec![Self::Up, Self::Right, Self::Down, Self::Left]
 	}
 }

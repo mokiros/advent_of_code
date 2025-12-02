@@ -3,9 +3,8 @@ use std::{
 	io::BufRead,
 };
 
-pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
+pub fn solve<R: BufRead>(reader: R) -> (String, String) {
 	let mut p1 = 0;
-	let p2;
 
 	let mut encountered_changes: HashSet<[i8; 4]> = HashSet::new();
 	let mut changes: HashMap<[i8; 4], u16> = HashMap::new();
@@ -48,7 +47,7 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 		p1 += n1;
 	}
 
-	p2 = *changes.iter().map(|v| v.1).max().unwrap() as i64;
+	let p2 = i64::from(*changes.iter().map(|v| v.1).max().unwrap());
 
-	return (p1, p2);
+	(p1.to_string(), p2.to_string())
 }

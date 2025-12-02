@@ -22,19 +22,23 @@ fn read_map<R: BufRead>(reader: &mut R) -> (Matrix<u8>, HashSet<Position>) {
 					y: height,
 				});
 			}
-			data.push(n as u8);
+			data.push(u8::try_from(n).unwrap());
 			width += 1;
 		}
 		height += 1;
 	}
 
 	(
-		Matrix::new(width as u8, height as u8, data),
+		Matrix::new(
+			u8::try_from(width).unwrap(),
+			u8::try_from(height).unwrap(),
+			data,
+		),
 		start_positions,
 	)
 }
 
-pub fn solve<R: BufRead + Seek>(mut reader: R) -> (i64, i64) {
+pub fn solve<R: BufRead + Seek>(mut reader: R) -> (String, String) {
 	let (map, positions) = read_map(&mut reader);
 
 	let mut p1 = 0;
@@ -46,7 +50,7 @@ pub fn solve<R: BufRead + Seek>(mut reader: R) -> (i64, i64) {
 		endpoints.push(pos);
 
 		for i in 1..=9 {
-			for pos in endpoints.iter() {
+			for pos in &endpoints {
 				for dir in Direction::all() {
 					let next_pos = dir.update_position(pos);
 					if map.get(next_pos.x, next_pos.y) == Some(i) {
@@ -55,17 +59,15 @@ pub fn solve<R: BufRead + Seek>(mut reader: R) -> (i64, i64) {
 				}
 			}
 
-			let temp = endpoints;
-			endpoints = next_endpoints;
-			next_endpoints = temp;
+			std::mem::swap(&mut endpoints, &mut next_endpoints);
 			next_endpoints.clear();
 		}
 
-		if endpoints.len() > 0 {
-			p2 += endpoints.len() as i64;
+		if !endpoints.is_empty() {
+			p2 += i64::try_from(endpoints.len()).unwrap();
 			p1 += HashSet::<Position>::from_iter(endpoints).len();
 		}
 	}
 
-	(p1 as i64, p2 as i64)
+	(p1.to_string(), p2.to_string())
 }

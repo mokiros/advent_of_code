@@ -1,6 +1,6 @@
 use std::io::BufRead;
 
-pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
+pub fn solve<R: BufRead>(reader: R) -> (String, String) {
 	let mut lines = reader.lines();
 
 	let mut p1 = 0;
@@ -18,7 +18,7 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 		counts[0] = 1;
 
 		for i in 1..=n {
-			for towel in towels.iter() {
+			for towel in &towels {
 				let len = towel.len();
 				if i >= len && towel == &&line[(i - len)..i] {
 					counts[i] += counts[i - len];
@@ -27,9 +27,9 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 		}
 
 		let count = counts[n];
-		p1 += (count != 0) as usize;
+		p1 += usize::from(count != 0);
 		p2 += count;
 	}
 
-	(p1 as i64, p2 as i64)
+	(p1.to_string(), p2.to_string())
 }

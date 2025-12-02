@@ -46,7 +46,7 @@ fn bfs(map: &Matrix<u16>, iteration: u16) -> Option<usize> {
 	None
 }
 
-pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
+pub fn solve<R: BufRead>(reader: R) -> (String, String) {
 	let mut map: Matrix<u16> =
 		Matrix::new(WIDTH as u8, HEIGHT as u8, vec![u16::MAX; WIDTH * HEIGHT]);
 	let mut bytes = Vec::new();
@@ -56,7 +56,7 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 	// Read all positions at once
 	for (i, line) in reader.lines().enumerate() {
 		let line = line.unwrap();
-		let mut parts = line.split(",");
+		let mut parts = line.split(',');
 
 		let x = parts.next().unwrap().parse().unwrap();
 		let y = parts.next().unwrap().parse().unwrap();
@@ -71,7 +71,7 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 
 	// binary search
 	while min < max {
-		let mid = (min + max) / 2;
+		let mid = u16::midpoint(min, max);
 		if bfs(&map, mid).is_none() {
 			max = mid;
 		} else {
@@ -84,5 +84,5 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 
 	println!("Part 2: {},{}; Byte number: {}", pos.x, pos.y, byte_idx);
 
-	(p1 as i64, -1)
+	(p1.to_string(), (-1).to_string())
 }

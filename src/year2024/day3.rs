@@ -12,7 +12,7 @@ fn part_1(file: &str) -> i32 {
 		count += x * y;
 	}
 
-	return count;
+	count
 }
 
 fn part_2(file: &str) -> i32 {
@@ -35,19 +35,19 @@ fn part_2(file: &str) -> i32 {
 					count += x * y;
 				}
 			}
-			_ => continue,
+			_ => {}
 		}
 	}
 
-	return count;
+	count
 }
 
-pub fn solve<R: BufRead + Seek>(mut reader: R) -> (i64, i64) {
+pub fn solve<R: BufRead + Seek>(mut reader: R) -> (String, String) {
 	let mut file = String::new();
 	reader.read_to_string(&mut file).unwrap();
 
 	let p1 = part_1(&file);
 	let p2 = part_2(&file);
 
-	(p1 as i64, p2 as i64)
+	(p1.to_string(), p2.to_string())
 }

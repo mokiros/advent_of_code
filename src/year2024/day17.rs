@@ -17,8 +17,8 @@ impl Operand {
 		}
 	}
 
-	fn literal(&self) -> usize {
-		self.0 as usize
+	const fn literal(&self) -> usize {
+		self.0
 	}
 }
 
@@ -45,7 +45,7 @@ impl Opcode {
 			5 => Self::OUT,
 			6 => Self::BDV,
 			7 => Self::CDV,
-			_ => panic!("Invalid opcode: {}", op),
+			_ => panic!("Invalid opcode: {op}"),
 		}
 	}
 }
@@ -53,7 +53,7 @@ impl Opcode {
 impl std::str::FromStr for Opcode {
 	type Err = std::fmt::Error;
 	fn from_str(s: &str) -> Result<Self, std::fmt::Error> {
-		Ok(Opcode::new(s.parse().unwrap()))
+		Ok(Self::new(s.parse().unwrap()))
 	}
 }
 
@@ -73,18 +73,17 @@ fn run(
 		ip += 2;
 
 		match opcode {
-			Opcode::ADV => reg_a = reg_a / 2_usize.pow(operand.combo(reg_a, reg_b, reg_c) as u32),
-			Opcode::BXL => reg_b = reg_b ^ operand.literal(),
+			Opcode::BXL => reg_b ^= operand.literal(),
 			Opcode::BST => reg_b = operand.combo(reg_a, reg_b, reg_c) % 8,
 			Opcode::JNZ => {
 				if reg_a != 0 {
-					ip = operand.literal() as usize;
+					ip = operand.literal();
 					continue;
 				}
 			}
-			Opcode::BXC => reg_b = reg_b ^ reg_c,
+			Opcode::BXC => reg_b ^= reg_c,
 			Opcode::OUT => output.push(operand.combo(reg_a, reg_b, reg_c) % 8),
-			Opcode::BDV => reg_a = reg_a / 2_usize.pow(operand.combo(reg_a, reg_b, reg_c) as u32),
+			Opcode::ADV | Opcode::BDV => reg_a = reg_a / 2_usize.pow(operand.combo(reg_a, reg_b, reg_c) as u32),
 			Opcode::CDV => reg_c = reg_a / 2_usize.pow(operand.combo(reg_a, reg_b, reg_c) as u32),
 		}
 	}
@@ -92,7 +91,7 @@ fn run(
 	output
 }
 
-pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
+pub fn solve<R: BufRead>(reader: R) -> (String, String) {
 	let mut lines = reader.lines();
 
 	let re = Regex::new(r"Register ([ABC]): (\d+)").unwrap();
@@ -110,7 +109,7 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 				"A" => reg_a = value,
 				"B" => reg_b = value,
 				"C" => reg_c = value,
-				_ => panic!("Invalid register: {}", register),
+				_ => panic!("Invalid register: {register}"),
 			}
 		}
 	}
@@ -120,10 +119,9 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 	let line = lines.next().unwrap().unwrap();
 	let instructions: Vec<usize> = line
 		.split_whitespace()
-		.skip(1)
-		.next()
+		.nth(1)
 		.unwrap()
-		.split(",")
+		.split(',')
 		.map(|s| s.parse().unwrap())
 		.collect();
 
@@ -162,5 +160,5 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 		}
 	}
 
-	(0, p2 as i64)
+	(0.to_string(), p2.to_string())
 }

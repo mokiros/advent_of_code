@@ -8,11 +8,11 @@ enum Op {
 }
 
 #[inline]
-fn concat(a: i64, b: i64) -> i64 {
+const fn concat(a: i64, b: i64) -> i64 {
 	a * 10i64.pow(b.ilog10() + 1) + b
 }
 
-fn count_numbers(numbers: &Vec<i64>, operations: &[Op]) -> i64 {
+fn count_numbers(numbers: &[i64], operations: &[Op]) -> i64 {
 	let mut count = numbers[0];
 
 	for i in 1..numbers.len() {
@@ -26,22 +26,50 @@ fn count_numbers(numbers: &Vec<i64>, operations: &[Op]) -> i64 {
 	count
 }
 
-fn count_numbers_binary(numbers: &Vec<i64>, bits: u16) -> i64 {
+fn count_numbers_binary(numbers: &[i64], bits: u16) -> i64 {
 	let mut count = numbers[0];
 
-	for i in 1..numbers.len() {
-		let is_mul = (bits & 2_u16.pow(i as u32 - 1)) > 0;
+	for (i, num) in numbers.iter().enumerate().skip(1) {
+		let is_mul = (bits & 2_u16.pow(u32::try_from(i).unwrap() - 1)) > 0;
 		if is_mul {
-			count *= numbers[i];
+			count *= num;
 		} else {
-			count += numbers[i];
+			count += num;
 		}
 	}
 
 	count
 }
 
-pub fn solve<R: BufRead + Seek>(reader: R) -> (i64, i64) {
+// part2
+fn recursive(numbers: &Vec<i64>, target: i64, operations: &mut [Op; 16], n: u8) -> bool {
+	if n == 0 {
+		return count_numbers(numbers, operations) == target;
+	}
+
+	if recursive(numbers, target, operations, n - 1) {
+		operations[n as usize - 1] = Op::Add;
+		return true;
+	}
+
+	operations[n as usize - 1] = Op::Multiply;
+	if recursive(numbers, target, operations, n - 1) {
+		operations[n as usize - 1] = Op::Add;
+		return true;
+	}
+
+	operations[n as usize - 1] = Op::Concat;
+	if recursive(numbers, target, operations, n - 1) {
+		operations[n as usize - 1] = Op::Add;
+		return true;
+	}
+
+	operations[n as usize - 1] = Op::Add;
+
+	false
+}
+
+pub fn solve<R: BufRead + Seek>(reader: R) -> (String, String) {
 	let mut p1: i64 = 0;
 	let mut p2: i64 = 0;
 
@@ -54,11 +82,11 @@ pub fn solve<R: BufRead + Seek>(reader: R) -> (i64, i64) {
 				a.parse().unwrap(),
 				b.split_whitespace().map(|n| n.parse().unwrap()).collect(),
 			),
-			None => panic!("Incorrect line: {}", line),
+			None => panic!("Incorrect line: {line}"),
 		};
 
 		// part 1
-		let all_mul = 2_u16.pow(numbers.len() as u32 - 1) - 1;
+		let all_mul = 2_u16.pow(u32::try_from(numbers.len()).unwrap() - 1) - 1;
 		for i in 0..=all_mul {
 			let result = count_numbers_binary(&numbers, i);
 			if result == target {
@@ -67,38 +95,15 @@ pub fn solve<R: BufRead + Seek>(reader: R) -> (i64, i64) {
 			}
 		}
 
-		// part2
-		fn recursive(numbers: &Vec<i64>, target: i64, operations: &mut [Op; 16], n: u8) -> bool {
-			if n == 0 {
-				return count_numbers(numbers, operations) == target;
-			}
-
-			if recursive(numbers, target, operations, n - 1) {
-				operations[n as usize - 1] = Op::Add;
-				return true;
-			}
-
-			operations[n as usize - 1] = Op::Multiply;
-			if recursive(numbers, target, operations, n - 1) {
-				operations[n as usize - 1] = Op::Add;
-				return true;
-			}
-
-			operations[n as usize - 1] = Op::Concat;
-			if recursive(numbers, target, operations, n - 1) {
-				operations[n as usize - 1] = Op::Add;
-				return true;
-			}
-
-			operations[n as usize - 1] = Op::Add;
-
-			return false;
-		}
-
-		if recursive(&numbers, target, &mut operations, numbers.len() as u8 - 1) {
+		if recursive(
+			&numbers,
+			target,
+			&mut operations,
+			u8::try_from(numbers.len()).unwrap() - 1,
+		) {
 			p2 += target;
 		}
 	}
 
-	(p1, p2)
+	(p1.to_string(), p2.to_string())
 }

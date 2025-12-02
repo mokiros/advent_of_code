@@ -9,7 +9,7 @@ struct Position {
 	y: i8,
 }
 
-pub fn solve<R: BufRead + Seek>(reader: R) -> (i64, i64) {
+pub fn solve<R: BufRead + Seek>(reader: R) -> (String, String) {
 	let mut width: i8 = 0;
 	let mut height: i8 = 0;
 
@@ -37,9 +37,9 @@ pub fn solve<R: BufRead + Seek>(reader: R) -> (i64, i64) {
 	let mut antinodes1: HashSet<Position> = HashSet::new();
 	let mut antinodes2: HashSet<Position> = HashSet::new();
 
-	for (_, positions) in node_positions.iter() {
-		for p1 in positions.iter() {
-			for p2 in positions.iter() {
+	for positions in node_positions.values() {
+		for p1 in positions {
+			for p2 in positions {
 				if p1 == p2 {
 					continue;
 				}
@@ -50,11 +50,11 @@ pub fn solve<R: BufRead + Seek>(reader: R) -> (i64, i64) {
 
 				let mut i = 0;
 				while !(p3.x < 1 || p3.x > width || p3.y < 1 || p3.y > height) {
-					antinodes2.insert(p3.clone());
+					antinodes2.insert(p3);
 					p3.x += dx;
 					p3.y += dy;
 					if i == 0 {
-						antinodes1.insert(p3.clone());
+						antinodes1.insert(p3);
 						i = 1;
 					}
 				}
@@ -62,5 +62,5 @@ pub fn solve<R: BufRead + Seek>(reader: R) -> (i64, i64) {
 		}
 	}
 
-	(antinodes1.len() as i64, antinodes2.len() as i64)
+	(antinodes1.len().to_string(), antinodes2.len().to_string())
 }

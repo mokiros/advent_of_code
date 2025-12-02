@@ -1,10 +1,15 @@
 #![feature(iter_array_chunks)]
 
-use std::{fs::File, io::BufReader, time::Instant};
+use std::{
+	fs::File,
+	io::{BufRead, BufReader},
+	time::Instant,
+};
 
 use clap::Parser;
 
 mod util;
+
 mod year2024;
 
 #[derive(Parser, Debug)]
@@ -18,12 +23,17 @@ struct Args {
 
 	#[arg(short, long)]
 	input: Option<String>,
+
+	#[arg(short, long)]
+	example_only: Option<bool>,
 }
 
-fn run(year: u16, day: u8, input: Option<String>) -> Result<(), ()> {
-	let input_path = input.unwrap_or(format!("./input/{}/{}.txt", year, day));
+fn run(year: u16, day: u8, input: Option<String>, example_only: bool) -> Result<(), ()> {
+	let input_path = input.unwrap_or_else(|| format!("./input/{year}/{day}.txt"));
+	let example_input_path = format!("./input/examples/{year}/{day}.txt");
+	let example_answer_path = format!("./input/examples/{year}/{day}_answer.txt");
 
-	let solve: fn(BufReader<File>) -> (i64, i64) = match (year, day) {
+	let solve: fn(BufReader<File>) -> (String, String) = match (year, day) {
 		(2024, 1) => year2024::day1::solve,
 		(2024, 2) => year2024::day2::solve,
 		(2024, 3) => year2024::day3::solve,
@@ -51,6 +61,48 @@ fn run(year: u16, day: u8, input: Option<String>) -> Result<(), ()> {
 		_ => return Err(()),
 	};
 
+	println!("Year {year}, Day {day}");
+
+	{
+		let example_input_file =
+			File::open(example_input_path).expect("Unable to open example input file");
+		let example_answer_file =
+			File::open(example_answer_path).expect("Unable to open example answer file");
+
+		let input_reader = BufReader::new(example_input_file);
+
+		let (part_1, part_2) = solve(input_reader);
+
+		let mut example_reader = BufReader::new(example_answer_file);
+
+		let mut part_1_answer = String::new();
+		let mut part_2_answer = String::new();
+
+		example_reader
+			.read_line(&mut part_1_answer)
+			.expect("Unable to read example part 1 answer");
+		example_reader
+			.read_line(&mut part_2_answer)
+			.expect("Unable to read example part 2 answer");
+
+		let part_1_answer_trimmed = part_1_answer.trim();
+		let part_2_answer_trimmed = part_2_answer.trim();
+
+		if !part_1_answer.is_empty() && part_1 != part_1_answer_trimmed {
+			println!(
+				"Mismatched answers in part 1: Expected {part_1_answer_trimmed}, got {part_1}"
+			);
+		}
+		if !part_2_answer.is_empty() && part_2 != part_2_answer_trimmed {
+			println!(
+				"Mismatched answers in part 2: Expected {part_2_answer_trimmed}, got {part_2}"
+			);
+		}
+		if example_only {
+			return Ok(());
+		}
+	}
+
 	let file = File::open(input_path).expect("Unable to open file");
 	let reader = BufReader::new(file);
 
@@ -60,10 +112,9 @@ fn run(year: u16, day: u8, input: Option<String>) -> Result<(), ()> {
 
 	let elapsed = now.elapsed();
 
-	println!("Year {}, Day {}", year, day);
-	println!("Part 1: {}", part_1);
-	println!("Part 2: {}", part_2);
-	println!("Runtime: {:.2?}", elapsed);
+	println!("Part 1: {part_1}");
+	println!("Part 2: {part_2}");
+	println!("Runtime: {elapsed:.2?}");
 
 	Ok(())
 }
@@ -71,19 +122,18 @@ fn run(year: u16, day: u8, input: Option<String>) -> Result<(), ()> {
 fn main() {
 	let args = Args::parse();
 
-	let years = match args.year {
-		Some(year) => year..=year,
-		None => 2024..=2024,
-	};
+	let years = args.year.map_or(2024..=2024, |year| year..=year);
 
-	let days = match args.day {
-		Some(day) => day..=day,
-		None => 1..=25,
-	};
+	let days = args.day.map_or(1..=25, |day| day..=day);
 
 	for year in years {
 		for day in days.clone() {
-			let result = run(year, day, args.input.clone());
+			let result = run(
+				year,
+				day,
+				args.input.clone(),
+				args.example_only.unwrap_or(false),
+			);
 
 			if result.is_err() {
 				return;

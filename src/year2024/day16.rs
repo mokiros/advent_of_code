@@ -7,8 +7,8 @@ fn read_map<R: BufRead>(reader: R) -> (Matrix<bool>, Position, Position) {
 	let mut end_position: Option<Position> = Some(Position { x: 0, y: 0 });
 
 	let mut data: Vec<bool> = Vec::new();
-	let mut width = 0;
-	let mut height = 0;
+	let mut width: u8 = 0;
+	let mut height: u8 = 0;
 
 	for line in reader.lines() {
 		let line = line.unwrap();
@@ -21,15 +21,15 @@ fn read_map<R: BufRead>(reader: R) -> (Matrix<bool>, Position, Position) {
 			match char {
 				'S' => {
 					start_position = Some(Position {
-						x: width - 1,
-						y: height - 1,
-					})
+						x: isize::from(width - 1),
+						y: isize::from(height - 1),
+					});
 				}
 				'E' => {
 					end_position = Some(Position {
-						x: width - 1,
-						y: height - 1,
-					})
+						x: isize::from(width - 1),
+						y: isize::from(height - 1),
+					});
 				}
 				_ => (),
 			}
@@ -37,13 +37,13 @@ fn read_map<R: BufRead>(reader: R) -> (Matrix<bool>, Position, Position) {
 	}
 
 	(
-		Matrix::new(width as u8, height as u8, data),
+		Matrix::new(width, height, data),
 		start_position.unwrap(),
 		end_position.unwrap(),
 	)
 }
 
-pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
+pub fn solve<R: BufRead>(reader: R) -> (String, String) {
 	let (map, start_pos, end_pos) = read_map(reader);
 
 	let mut buckets = vec![Vec::new(); 1001];
@@ -59,7 +59,7 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 	seen.get_mut(start_pos.x, start_pos.y).unwrap()[Direction::Right as usize] = 0;
 
 	while lowest == i32::MAX {
-		let index = (cost % 1001) as usize;
+		let index = usize::try_from(cost % 1001).unwrap();
 
 		while let Some((position, direction)) = buckets[index].pop() {
 			if position == end_pos {
@@ -76,12 +76,12 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 			];
 
 			for (next_position, next_direction, next_cost) in next {
-				if map.get(next_position.x, next_position.y).unwrap_or(true) != true
+				if !map.get(next_position.x, next_position.y).unwrap_or(true)
 					&& next_cost
 						< seen.get(next_position.x, next_position.y).unwrap()
 							[next_direction as usize]
 				{
-					let index = (next_cost % 1001) as usize;
+					let index = usize::try_from(next_cost % 1001).unwrap();
 					buckets[index].push((next_position, next_direction));
 					seen.get_mut(next_position.x, next_position.y).unwrap()
 						[next_direction as usize] = next_cost;
@@ -136,7 +136,7 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 	}
 
 	(
-		lowest as i64,
-		path.data.iter().filter(|&&b| b).count() as i64,
+		lowest.to_string(),
+		path.data.iter().filter(|&&b| b).count().to_string(),
 	)
 }

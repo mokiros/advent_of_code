@@ -1,6 +1,6 @@
 use std::io::{BufRead, Seek};
 
-fn calc(x1: i64, y1: i64, x2: i64, y2: i64, x3: i64, y3: i64) -> Option<i64> {
+const fn calc(x1: i64, y1: i64, x2: i64, y2: i64, x3: i64, y3: i64) -> Option<i64> {
 	let n1 = x1 * y3 - y1 * x3;
 	let n2 = y2 * x3 - x2 * y3;
 	let div = x1 * y2 - y1 * x2;
@@ -19,7 +19,7 @@ fn calc(x1: i64, y1: i64, x2: i64, y2: i64, x3: i64, y3: i64) -> Option<i64> {
 	}
 }
 
-pub fn solve<R: BufRead + Seek>(reader: R) -> (i64, i64) {
+pub fn solve<R: BufRead + Seek>(reader: R) -> (String, String) {
 	let re = regex::Regex::new(r"(\d+)").unwrap();
 	let mut numbers = Vec::with_capacity(6);
 
@@ -43,12 +43,19 @@ pub fn solve<R: BufRead + Seek>(reader: R) -> (i64, i64) {
 				if let Some(n) = calc(x1, y1, x2, y2, x3, y3) {
 					p1 += n;
 				}
-				if let Some(n) = calc(x1, y1, x2, y2, x3 + 10000000000000, y3 + 10000000000000) {
+				if let Some(n) = calc(
+					x1,
+					y1,
+					x2,
+					y2,
+					x3 + 10_000_000_000_000,
+					y3 + 10_000_000_000_000,
+				) {
 					p2 += n;
 				}
 			}
 		}
 	}
 
-	(p1, p2)
+	(p1.to_string(), p2.to_string())
 }

@@ -55,6 +55,37 @@ fn part_1(
 	map
 }
 
+fn can_move(
+	map: &Matrix<MapPart>,
+	queue: &mut HashMap<Position, MapPart>,
+	dir: Direction,
+	current_pos: Position,
+) -> bool {
+	let next_pos = dir.update_position(&current_pos);
+	let check_move = match (dir, map.get(next_pos.x, next_pos.y)) {
+		(Direction::Left | Direction::Right, Some(MapPart::LeftBox | MapPart::RightBox)) => {
+			can_move(map, queue, dir, next_pos)
+		}
+		(_, Some(MapPart::LeftBox)) => {
+			can_move(map, queue, dir, next_pos)
+				&& can_move(map, queue, dir, Direction::Right.update_position(&next_pos))
+		}
+		(_, Some(MapPart::RightBox)) => {
+			can_move(map, queue, dir, next_pos)
+				&& can_move(map, queue, dir, Direction::Left.update_position(&next_pos))
+		}
+		(_, Some(MapPart::Empty)) => true,
+		_ => false,
+	};
+
+	if check_move {
+		queue.insert(next_pos, map.get(current_pos.x, current_pos.y).unwrap());
+		queue.entry(current_pos).or_insert(MapPart::Empty);
+	}
+
+	check_move
+}
+
 fn part_2(
 	map: &Matrix<MapPart>,
 	robot_pos: Position,
@@ -62,7 +93,7 @@ fn part_2(
 ) -> Matrix<MapPart> {
 	let mut data = Vec::with_capacity(map.data.len() * 2);
 
-	for part in map.data.iter() {
+	for part in &map.data {
 		match part {
 			MapPart::Wall => {
 				data.push(MapPart::Wall);
@@ -76,7 +107,7 @@ fn part_2(
 				data.push(MapPart::Empty);
 				data.push(MapPart::Empty);
 			}
-			_ => panic!("Invalid map character: {:?}", part),
+			_ => panic!("Invalid map character: {part:?}"),
 		}
 	}
 
@@ -91,43 +122,9 @@ fn part_2(
 	for dir in directions {
 		queue.clear();
 
-		fn can_move(
-			map: &Matrix<MapPart>,
-			queue: &mut HashMap<Position, MapPart>,
-			dir: Direction,
-			current_pos: Position,
-		) -> bool {
-			let next_pos = dir.update_position(&current_pos);
-			let check_move = match (dir, map.get(next_pos.x, next_pos.y)) {
-				(
-					Direction::Left | Direction::Right,
-					Some(MapPart::LeftBox) | Some(MapPart::RightBox),
-				) => can_move(map, queue, dir, next_pos),
-				(_, Some(MapPart::LeftBox)) => {
-					can_move(map, queue, dir, next_pos)
-						&& can_move(map, queue, dir, Direction::Right.update_position(&next_pos))
-				}
-				(_, Some(MapPart::RightBox)) => {
-					can_move(map, queue, dir, next_pos)
-						&& can_move(map, queue, dir, Direction::Left.update_position(&next_pos))
-				}
-				(_, Some(MapPart::Empty)) => true,
-				_ => false,
-			};
-
-			if check_move {
-				queue.insert(next_pos, map.get(current_pos.x, current_pos.y).unwrap());
-				if !queue.contains_key(&current_pos) {
-					queue.insert(current_pos, MapPart::Empty);
-				}
-			}
-
-			check_move
-		}
-
 		if can_move(&map, &mut queue, *dir, robot_pos) {
 			robot_pos = dir.update_position(&robot_pos);
-			for (pos, part) in queue.iter() {
+			for (pos, part) in &queue {
 				map.set(pos.x, pos.y, *part);
 			}
 		}
@@ -140,16 +137,15 @@ fn calculate_gps(map: &Matrix<MapPart>) -> i64 {
 	let mut sum = 0;
 	for y in 0..map.height as isize {
 		for x in 0..map.width as isize {
-			match map.get(x, y) {
-				Some(MapPart::Box) | Some(MapPart::LeftBox) => sum += 100 * y + x,
-				_ => {}
+			if let Some(MapPart::Box | MapPart::LeftBox) = map.get(x, y) {
+				sum += 100 * y + x;
 			}
 		}
 	}
 	sum as i64
 }
 
-pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
+pub fn solve<R: BufRead>(reader: R) -> (String, String) {
 	let mut data = Vec::new();
 	let mut width = 0;
 	let mut height = 0;
@@ -173,11 +169,8 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 				directions.push(dir);
 			}
 		} else if line.is_empty() {
-			if robot_pos.is_none() {
-				panic!("No robot position found");
-			}
-			let _map = Matrix::new(width, height, data.clone());
-			map = Some(_map);
+			assert!(robot_pos.is_some(), "No robot position found");
+			map = Some(Matrix::new(width, height, data.clone()));
 		} else {
 			height += 1;
 			width = 0;
@@ -192,17 +185,15 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 							x: width as isize - 1,
 							y: height as isize - 1,
 						});
-						data.push(MapPart::Empty)
+						data.push(MapPart::Empty);
 					}
-					_ => panic!("Invalid map character: {}", char),
+					_ => panic!("Invalid map character: {char}"),
 				}
 			}
 		}
 	}
 
-	if map.is_none() {
-		panic!("Invalid input");
-	}
+	assert!(map.is_some(), "Invalid input");
 
 	let map = map.unwrap();
 	let robot_pos = robot_pos.unwrap();
@@ -210,5 +201,8 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 	let map1 = part_1(&map, robot_pos, &directions);
 	let map2 = part_2(&map, robot_pos, &directions);
 
-	(calculate_gps(&map1), calculate_gps(&map2))
+	(
+		calculate_gps(&map1).to_string(),
+		calculate_gps(&map2).to_string(),
+	)
 }

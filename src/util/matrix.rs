@@ -9,16 +9,20 @@ pub struct Matrix<T> {
 	pub data: Vec<T>,
 }
 
+#[allow(unused)]
 impl<T: Copy> Matrix<T> {
-	pub fn new(width: u8, height: u8, data: Vec<T>) -> Self {
+	pub const fn new(width: u8, height: u8, data: Vec<T>) -> Self {
 		Self {
-			data,
 			width,
 			height,
+			data,
 		}
 	}
 
-	pub fn read_map_with_start_and_end<R: BufRead>(reader: R, char_fn: fn(char: char) -> T) -> (Matrix<T>, Position, Position) {
+	pub fn read_map_with_start_and_end<R: BufRead>(
+		reader: R,
+		char_fn: fn(char: char) -> T,
+	) -> (Self, Position, Position) {
 		let mut start_position: Option<Position> = Some(Position { x: 0, y: 0 });
 		let mut end_position: Option<Position> = Some(Position { x: 0, y: 0 });
 
@@ -39,13 +43,13 @@ impl<T: Copy> Matrix<T> {
 						start_position = Some(Position {
 							x: width - 1,
 							y: height - 1,
-						})
+						});
 					}
 					'E' => {
 						end_position = Some(Position {
 							x: width - 1,
 							y: height - 1,
-						})
+						});
 					}
 					_ => (),
 				}
@@ -53,17 +57,17 @@ impl<T: Copy> Matrix<T> {
 		}
 
 		(
-			Matrix::new(width as u8, height as u8, data),
+			Self::new(width.try_into().unwrap(), height.try_into().unwrap(), data),
 			start_position.unwrap(),
 			end_position.unwrap(),
 		)
 	}
 
-	fn get_idx(&self, x: isize, y: isize) -> Option<usize> {
+	const fn get_idx(&self, x: isize, y: isize) -> Option<usize> {
 		let w = self.width as isize;
 		let h = self.height as isize;
 		if x < w && y < h && x >= 0 && y >= 0 {
-			Some((y * w + x) as usize)
+			Some((y * w + x).cast_unsigned())
 		} else {
 			None
 		}
@@ -81,7 +85,7 @@ impl<T: Copy> Matrix<T> {
 		if let Some(idx) = self.get_idx(x, y) {
 			self.data[idx] = value;
 		} else {
-			panic!("Matrix index out of bounds: {} {}", x, y)
+			panic!("Matrix index out of bounds: {x} {y}")
 		}
 	}
 

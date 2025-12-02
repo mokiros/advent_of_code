@@ -14,7 +14,7 @@ fn part_1<R: BufRead>(reader: &mut R) -> i32 {
 				'M' => 1,
 				'A' => 2,
 				'S' => 3,
-				_ => panic!("Invalid character {}", c),
+				_ => panic!("Invalid character {c}"),
 			});
 		}
 	}
@@ -32,7 +32,7 @@ fn part_1<R: BufRead>(reader: &mut R) -> i32 {
 							continue;
 						}
 						for i in 0..=3 {
-							if matrix.get(x + dx * i, y + dy * i) != Some(i as u8) {
+							if matrix.get(x + dx * i, y + dy * i) != Some(i.try_into().unwrap()) {
 								continue 'dyloop;
 							}
 						}
@@ -43,7 +43,7 @@ fn part_1<R: BufRead>(reader: &mut R) -> i32 {
 		}
 	}
 
-	return count;
+	count
 }
 
 fn part_2<R: BufRead>(reader: &mut R) -> i32 {
@@ -58,7 +58,7 @@ fn part_2<R: BufRead>(reader: &mut R) -> i32 {
 				'M' => 1,
 				'A' => 2,
 				'S' => 3,
-				_ => panic!("Invalid character {}", c),
+				_ => panic!("Invalid character {c}"),
 			});
 		}
 	}
@@ -84,15 +84,15 @@ fn part_2<R: BufRead>(reader: &mut R) -> i32 {
 		}
 	}
 
-	return count;
+	count
 }
 
-pub fn solve<R: BufRead + Seek>(mut reader: R) -> (i64, i64) {
+pub fn solve<R: BufRead + Seek>(mut reader: R) -> (String, String) {
 	let p1 = part_1(&mut reader);
 
 	reader.rewind().expect("Unable to rewind");
 
 	let p2 = part_2(&mut reader);
 
-	(p1 as i64, p2 as i64)
+	(p1.to_string(), p2.to_string())
 }

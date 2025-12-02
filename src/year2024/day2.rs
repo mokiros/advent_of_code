@@ -1,6 +1,6 @@
 use std::io::{BufRead, Seek};
 
-fn check(nums: &Vec<i32>) -> bool {
+fn check(nums: &[i32]) -> bool {
 	if nums.len() <= 1 {
 		return true;
 	}
@@ -41,7 +41,7 @@ fn part_1<R: BufRead>(reader: &mut R) -> i32 {
 		}
 	}
 
-	return safe_reports;
+	safe_reports
 }
 
 fn part_2<R: BufRead>(reader: &mut R) -> i32 {
@@ -56,7 +56,7 @@ fn part_2<R: BufRead>(reader: &mut R) -> i32 {
 			.collect::<Vec<i32>>();
 
 		if check(&nums) {
-			safe_reports += 1
+			safe_reports += 1;
 		} else {
 			for i in 0..nums.len() {
 				let mut nums = nums.clone();
@@ -69,15 +69,15 @@ fn part_2<R: BufRead>(reader: &mut R) -> i32 {
 		}
 	}
 
-	return safe_reports;
+	safe_reports
 }
 
-pub fn solve<R: BufRead + Seek>(mut reader: R) -> (i64, i64) {
+pub fn solve<R: BufRead + Seek>(mut reader: R) -> (String, String) {
 	let p1 = part_1(&mut reader);
 
 	reader.rewind().expect("Unable to rewind");
 
 	let p2 = part_2(&mut reader);
 
-	(p1 as i64, p2 as i64)
+	(p1.to_string(), p2.to_string())
 }

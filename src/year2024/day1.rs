@@ -24,8 +24,8 @@ fn part_1<R: BufRead>(reader: &mut R) -> i32 {
 		y_values.push(y);
 	}
 
-	x_values.sort();
-	y_values.sort();
+	x_values.sort_unstable();
+	y_values.sort_unstable();
 
 	let mut sum = 0;
 
@@ -35,7 +35,7 @@ fn part_1<R: BufRead>(reader: &mut R) -> i32 {
 		sum += (x - y).abs();
 	}
 
-	return sum;
+	sum
 }
 
 fn part_2<R: BufRead>(reader: &mut R) -> i32 {
@@ -61,21 +61,20 @@ fn part_2<R: BufRead>(reader: &mut R) -> i32 {
 
 	let mut sum = 0;
 
-	for i in 0..values.len() {
-		let x = values[i];
+	for x in values {
 		let y = frequency.get(&x).unwrap_or(&0);
 		sum += x * y;
 	}
 
-	return sum;
+	sum
 }
 
-pub fn solve<R: BufRead + Seek>(mut reader: R) -> (i64, i64) {
+pub fn solve<R: BufRead + Seek>(mut reader: R) -> (String, String) {
 	let p1 = part_1(&mut reader);
 
 	reader.rewind().expect("Unable to rewind");
 
 	let p2 = part_2(&mut reader);
 
-	(p1 as i64, p2 as i64)
+	(p1.to_string(), p2.to_string())
 }

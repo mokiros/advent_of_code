@@ -2,7 +2,7 @@ use std::{collections::HashMap, io::BufRead, str::Chars};
 
 use itertools::Itertools;
 
-pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
+pub fn solve<R: BufRead>(reader: R) -> (String, String) {
 	type Computer = usize;
 	let tonum = |chars: &mut Chars| {
 		let c1 = chars.next().unwrap() as usize - b'a' as usize;
@@ -71,7 +71,7 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 		}
 	}
 
-	largest.sort();
+	largest.sort_unstable();
 
 	println!(
 		"Part 2: {}",
@@ -87,5 +87,5 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 			.join(",")
 	);
 
-	return (p1, -1);
+	(p1.to_string(), (-1).to_string())
 }

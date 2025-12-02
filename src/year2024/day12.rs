@@ -39,7 +39,7 @@ fn calculate_area(
 				let is_corner_plot = check(nx + previous.0, ny + previous.1);
 
 				if is_current_plot == is_previous_plot
-					&& (is_corner_plot != true || is_current_plot == false)
+					&& (!is_corner_plot || !is_current_plot)
 				{
 					angles += 1;
 				}
@@ -55,16 +55,14 @@ fn calculate_area(
 			}
 		}
 
-		let temp = a;
-		a = b;
-		b = temp;
+		std::mem::swap(&mut a, &mut b);
 		b.clear();
 	}
 
 	(area * edges_num, area * angles)
 }
 
-pub fn solve<R: BufRead + Seek>(reader: R) -> (i64, i64) {
+pub fn solve<R: BufRead + Seek>(reader: R) -> (String, String) {
 	let mut data: Vec<Option<char>> = Vec::new();
 	let mut width: u8 = 0;
 	let mut height: u8 = 0;
@@ -94,5 +92,5 @@ pub fn solve<R: BufRead + Seek>(reader: R) -> (i64, i64) {
 		}
 	}
 
-	(p1 as i64, p2 as i64)
+	(p1.to_string(), p2.to_string())
 }

@@ -14,7 +14,7 @@ fn part_1<R: BufRead>(reader: &mut R) -> usize {
 		}
 
 		if is_order {
-			let mut parts = line.split("|");
+			let mut parts = line.split('|');
 			let a = parts
 				.next()
 				.expect("Unable to parse a")
@@ -30,7 +30,7 @@ fn part_1<R: BufRead>(reader: &mut R) -> usize {
 		}
 
 		let pages = line
-			.split(",")
+			.split(',')
 			.map(|x| x.parse::<usize>().expect("Unable to parse number"))
 			.collect::<Vec<usize>>();
 
@@ -45,7 +45,7 @@ fn part_1<R: BufRead>(reader: &mut R) -> usize {
 		count += pages[pages.len() / 2];
 	}
 
-	return count;
+	count
 }
 
 fn part_2<R: BufRead>(reader: &mut R) -> usize {
@@ -62,7 +62,7 @@ fn part_2<R: BufRead>(reader: &mut R) -> usize {
 		}
 
 		if is_order {
-			let mut parts = line.split("|");
+			let mut parts = line.split('|');
 			let a = parts
 				.next()
 				.expect("Unable to parse a")
@@ -78,15 +78,15 @@ fn part_2<R: BufRead>(reader: &mut R) -> usize {
 		}
 
 		let pages = line
-			.split(",")
+			.split(',')
 			.map(|x| x.parse::<usize>().expect("Unable to parse number"))
 			.collect::<Vec<usize>>();
 
 		for i in 0..pages.len() - 1 {
 			if ordering[pages[i]][pages[i + 1]] {
-				for page in pages.iter() {
+				for page in &pages {
 					let mut sum = 0;
-					for n in pages.iter() {
+					for n in &pages {
 						if *n != *page && ordering[*n][*page] {
 							sum += 1;
 						}
@@ -100,15 +100,15 @@ fn part_2<R: BufRead>(reader: &mut R) -> usize {
 		}
 	}
 
-	return count;
+	count
 }
 
-pub fn solve<R: BufRead + Seek>(mut reader: R) -> (i64, i64) {
+pub fn solve<R: BufRead + Seek>(mut reader: R) -> (String, String) {
 	let p1 = part_1(&mut reader);
 
 	reader.rewind().expect("Unable to rewind");
 
 	let p2 = part_2(&mut reader);
 
-	(p1 as i64, p2 as i64)
+	(p1.to_string(), p2.to_string())
 }

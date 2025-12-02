@@ -10,9 +10,9 @@ impl ID {
 		const DIGIT_OFFSET: u16 = b'0' as u16;
 		let mut n: u16 = 0;
 		for _ in 0..3 {
-			let mut d = bytes.next().unwrap() as u16;
+			let mut d = u16::from(bytes.next().unwrap());
 			if d - DIGIT_OFFSET < 10 {
-				d = d - DIGIT_OFFSET;
+				d -= DIGIT_OFFSET;
 			} else {
 				d = d - OFFSET + 10;
 			}
@@ -23,17 +23,16 @@ impl ID {
 
 	fn get(
 		&self,
-		values: &mut HashMap<ID, u8>,
-		operations: &HashMap<ID, (Operation, ID, ID)>,
+		values: &mut HashMap<Self, u8>,
+		operations: &HashMap<Self, (Operation, Self, Self)>,
 	) -> u8 {
-		match values.get(self) {
-			Some(value) => *value,
-			None => {
-				let (op, lhs, rhs) = operations.get(self).unwrap();
-				let result = op.calc(values, operations, lhs, rhs);
-				values.insert(*self, result);
-				result
-			}
+		if let Some(value) = values.get(self) {
+			*value
+		} else {
+			let (op, lhs, rhs) = operations.get(self).unwrap();
+			let result = op.calc(values, operations, lhs, rhs);
+			values.insert(*self, result);
+			result
 		}
 	}
 }
@@ -45,9 +44,9 @@ impl std::fmt::Display for ID {
 		while n > 0 {
 			let mut d = n % 36;
 			if d >= 10 {
-				d += b'a' as u16 - 10;
+				d += u16::from(b'a') - 10;
 			} else {
-				d += b'0' as u16;
+				d += u16::from(b'0');
 			}
 			chars.push(d as u8);
 			n /= 36;
@@ -67,7 +66,7 @@ impl Operation {
 	fn calc(
 		&self,
 		values: &mut HashMap<ID, u8>,
-		operations: &HashMap<ID, (Operation, ID, ID)>,
+		operations: &HashMap<ID, (Self, ID, ID)>,
 		lhs: &ID,
 		rhs: &ID,
 	) -> u8 {
@@ -85,15 +84,15 @@ impl Operation {
 impl From<&str> for Operation {
 	fn from(value: &str) -> Self {
 		match value {
-			"AND" => Operation::AND,
-			"OR" => Operation::OR,
-			"XOR" => Operation::XOR,
-			_ => panic!("Invalid operation: {}", value),
+			"AND" => Self::AND,
+			"OR" => Self::OR,
+			"XOR" => Self::XOR,
+			_ => panic!("Invalid operation: {value}"),
 		}
 	}
 }
 
-pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
+pub fn solve<R: BufRead>(reader: R) -> (String, String) {
 	let mut values: HashMap<ID, u8> = HashMap::new();
 	let mut operations: HashMap<ID, (Operation, ID, ID)> = HashMap::new();
 
@@ -110,11 +109,7 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 		}
 
 		let mut split = line.split_whitespace();
-		if !reading_operations {
-			let id = ID::new(split.next().unwrap());
-			let num: u8 = split.next().unwrap().parse().unwrap();
-			values.insert(id, num);
-		} else {
+		if reading_operations {
 			let lhs = ID::new(split.next().unwrap());
 			let op = Operation::from(split.next().unwrap());
 			let rhs = ID::new(split.next().unwrap());
@@ -126,14 +121,18 @@ pub fn solve<R: BufRead>(reader: R) -> (i64, i64) {
 			}
 
 			operations.insert(result, (op, lhs, rhs));
+		} else {
+			let id = ID::new(split.next().unwrap());
+			let num: u8 = split.next().unwrap().parse().unwrap();
+			values.insert(id, num);
 		}
 	}
 
 	outputs.sort();
 
 	let p1: i64 = outputs.iter().rev().fold(0, |p1, id| {
-		(p1 << 1) | id.get(&mut values, &operations) as i64
+		(p1 << 1) | i64::from(id.get(&mut values, &operations))
 	});
 
-	return (p1, 0);
+	(p1.to_string(), 0.to_string())
 }

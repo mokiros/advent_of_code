@@ -1,6 +1,6 @@
 use std::io::{BufRead, Seek};
 
-pub fn solve<R: BufRead + Seek>(reader: R) -> (i64, i64) {
+pub fn solve<R: BufRead + Seek>(reader: R) -> (String, String) {
 	let mut map: Vec<Option<usize>> = Vec::new();
 
 	for (i, byte) in reader.bytes().enumerate() {
@@ -11,7 +11,6 @@ pub fn solve<R: BufRead + Seek>(reader: R) -> (i64, i64) {
 		let length = ch.to_digit(10).unwrap();
 		let element = match i % 2 {
 			0 => Some(i / 2),
-			1 => None,
 			_ => None,
 		};
 
@@ -25,21 +24,20 @@ pub fn solve<R: BufRead + Seek>(reader: R) -> (i64, i64) {
 	let mut i = 0;
 	let mut p1 = 0;
 	while i <= end {
-		let n = match map[i] {
-			Some(n) => n,
-			None => {
-				while end > i && map[end] == None {
-					end -= 1;
-				}
-				if end <= i {
-					break;
-				}
-				let n = map[end].unwrap();
+		let n = if let Some(n) = map[i] {
+			n
+		} else {
+			while end > i && map[end].is_none() {
 				end -= 1;
-				n
 			}
+			if end <= i {
+				break;
+			}
+			let n = map[end].unwrap();
+			end -= 1;
+			n
 		};
-		p1 += (n as usize) * i;
+		p1 += n * i;
 		i += 1;
 	}
 
@@ -69,23 +67,17 @@ pub fn solve<R: BufRead + Seek>(reader: R) -> (i64, i64) {
 					}
 				}
 			}
-			match map[end] {
-				Some(n) => {
-					id = n;
-					length = 1;
-				}
-				None => {
-					id = 0;
-					length = 0;
-				}
+			if let Some(n) = map[end] {
+				id = n;
+				length = 1;
+			} else {
+				id = 0;
+				length = 0;
 			}
 		}
 	}
 
-	let p2 = map.iter().enumerate().fold(0, |acc, (i, v)| match v {
-		Some(n) => acc + n * i,
-		None => acc,
-	});
+	let p2 = map.iter().enumerate().fold(0, |acc, (i, v)| v.as_ref().map_or(acc, |n| acc + n * i));
 
-	(p1 as i64, p2 as i64)
+	(p1.to_string(), p2.to_string())
 }

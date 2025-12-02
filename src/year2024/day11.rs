@@ -6,7 +6,7 @@ use std::{
 
 // keeping this just incase I get a supercomputer to actually compute this
 #[allow(dead_code)]
-fn naive<R: BufRead + Seek>(mut reader: R) -> (i64, i64) {
+fn naive<R: BufRead + Seek>(mut reader: R) -> (String, String) {
 	let mut str = String::new();
 	reader.read_to_string(&mut str).unwrap();
 	let mut stones = str
@@ -18,7 +18,7 @@ fn naive<R: BufRead + Seek>(mut reader: R) -> (i64, i64) {
 	let mut p1 = 0;
 
 	for i in 0..75 {
-		println!("Iteration {}, count: {}", i, len);
+		println!("Iteration {i}, count: {len}");
 		if i == 25 {
 			p1 = len;
 		}
@@ -31,7 +31,7 @@ fn naive<R: BufRead + Seek>(mut reader: R) -> (i64, i64) {
 				if log % 2 == 0 {
 					stones[k] = n * 2024;
 				} else {
-					let l = 10_u64.pow((log + 1) / 2);
+					let l = 10_u64.pow(log.div_ceil(2));
 					stones[k] = n / l;
 					stones.push(n % l);
 					len += 1;
@@ -41,10 +41,10 @@ fn naive<R: BufRead + Seek>(mut reader: R) -> (i64, i64) {
 		thread::sleep(std::time::Duration::from_millis(100));
 	}
 
-	(p1 as i64, len as i64)
+	(p1.to_string(), len.to_string())
 }
 
-pub fn solve<R: BufRead + Seek>(mut reader: R) -> (i64, i64) {
+pub fn solve<R: BufRead + Seek>(mut reader: R) -> (String, String) {
 	let mut str = String::new();
 	reader.read_to_string(&mut str).unwrap();
 
@@ -62,7 +62,7 @@ pub fn solve<R: BufRead + Seek>(mut reader: R) -> (i64, i64) {
 			p1 = stones.values().sum();
 		}
 
-		for (n, count) in stones.iter() {
+		for (n, count) in &stones {
 			if *n == 0 {
 				*new_stones.entry(1).or_insert(0) += count;
 			} else {
@@ -70,18 +70,16 @@ pub fn solve<R: BufRead + Seek>(mut reader: R) -> (i64, i64) {
 				if log % 2 == 0 {
 					*new_stones.entry(n * 2024).or_insert(0) += count;
 				} else {
-					let l = 10_u64.pow((log + 1) / 2);
+					let l = 10_u64.pow(log.div_ceil(2));
 					*new_stones.entry(n / l).or_insert(0) += count;
 					*new_stones.entry(n % l).or_insert(0) += count;
 				}
 			}
 		}
 
-		let temp = stones;
-		stones = new_stones;
-		new_stones = temp;
+		std::mem::swap(&mut stones, &mut new_stones);
 		new_stones.clear();
 	}
 
-	(p1, stones.values().sum())
+	(p1.to_string(), stones.values().sum::<i64>().to_string())
 }
