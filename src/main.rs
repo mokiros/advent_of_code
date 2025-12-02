@@ -12,6 +12,8 @@ mod util;
 
 mod year2024;
 
+mod year2025;
+
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Args {
@@ -58,6 +60,8 @@ fn run(year: u16, day: u8, input: Option<String>, example_only: bool) -> Result<
 		(2024, 23) => year2024::day23::solve,
 		(2024, 24) => year2024::day24::solve,
 		(2024, 25) => year2024::day25::solve,
+
+		(2025, 1) => year2025::day1::solve,
 		_ => return Err(()),
 	};
 
@@ -122,7 +126,7 @@ fn run(year: u16, day: u8, input: Option<String>, example_only: bool) -> Result<
 fn main() {
 	let args = Args::parse();
 
-	let years = args.year.map_or(2024..=2024, |year| year..=year);
+	let years = args.year.map_or(2024..=2025, |year| year..=year);
 
 	let days = args.day.map_or(1..=25, |day| day..=day);
 
