@@ -68,6 +68,7 @@ fn run(year: u16, day: u8, input: Option<String>, example_only: bool) -> Result<
 		(2025, 5) => year2025::day5::solve,
 		(2025, 6) => year2025::day6::solve,
 		(2025, 7) => year2025::day7::solve,
+		(2025, 8) => year2025::day8::solve,
 		_ => return Err(()),
 	};
 
