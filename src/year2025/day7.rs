@@ -3,10 +3,12 @@ pub fn solve(buffer: &[u8]) -> (String, String) {
 
 	let mut beams = [0_u64; 150];
 
-	let mut x = 1;
+	let mut x = 0;
 	let mut i = 0;
 	while i < buffer.len() {
 		let byte = buffer[i];
+		i += 1;
+		x += 1;
 
 		match byte {
 			b'S' => {
@@ -23,15 +25,10 @@ pub fn solve(buffer: &[u8]) -> (String, String) {
 			}
 			b'\n' => {
 				i += x; // skip every other line
-				x = 1;
-				continue;
+				x = 0;
 			}
-			b'.' => {}
-			byte => panic!("Invalid character: {}", byte as char),
+			_ => {}
 		}
-
-		x += 1;
-		i += 1;
 	}
 
 	let part2: u64 = beams.iter().sum();
