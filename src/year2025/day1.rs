@@ -1,6 +1,7 @@
 use std::io::{BufRead, Seek};
 
-pub fn solve<R: BufRead + Seek>(reader: R) -> (String, String) {
+pub fn solve(buffer: &[u8]) -> (String, String) {
+	let mut reader = std::io::Cursor::new(buffer);
 	let mut rot = 50;
 	let mut zeroes = 0;
 	let mut wraps = 0;

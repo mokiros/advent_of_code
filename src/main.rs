@@ -2,7 +2,7 @@
 
 use std::{
 	fs::File,
-	io::{BufRead, BufReader},
+	io::{BufRead, BufReader, Read},
 	time::Instant,
 };
 
@@ -35,7 +35,7 @@ fn run(year: u16, day: u8, input: Option<String>, example_only: bool) -> Result<
 	let example_input_path = format!("./input/examples/{year}/{day}.txt");
 	let example_answer_path = format!("./input/examples/{year}/{day}_answer.txt");
 
-	let solve: fn(BufReader<File>) -> (String, String) = match (year, day) {
+	let solve: fn(&[u8]) -> (String, String) = match (year, day) {
 		(2024, 1) => year2024::day1::solve,
 		(2024, 2) => year2024::day2::solve,
 		(2024, 3) => year2024::day3::solve,
@@ -74,14 +74,17 @@ fn run(year: u16, day: u8, input: Option<String>, example_only: bool) -> Result<
 	println!("Year {year}, Day {day}");
 
 	{
-		let example_input_file =
-			File::open(example_input_path).expect("Unable to open example input file");
+		let mut example_input_file =
+			File::open(example_input_path).expect("to open example input file");
 		let example_answer_file =
-			File::open(example_answer_path).expect("Unable to open example answer file");
+			File::open(example_answer_path).expect("to open example answer file");
 
-		let input_reader = BufReader::new(example_input_file);
+		let mut buffer = Vec::new();
+		example_input_file
+			.read_to_end(&mut buffer)
+			.expect("read example input file");
 
-		let (part_1, part_2) = solve(input_reader);
+		let (part_1, part_2) = solve(&buffer);
 
 		let mut example_reader = BufReader::new(example_answer_file);
 
@@ -90,10 +93,10 @@ fn run(year: u16, day: u8, input: Option<String>, example_only: bool) -> Result<
 
 		example_reader
 			.read_line(&mut part_1_answer)
-			.expect("Unable to read example part 1 answer");
+			.expect("to read example part 1 answer");
 		example_reader
 			.read_line(&mut part_2_answer)
-			.expect("Unable to read example part 2 answer");
+			.expect("to read example part 2 answer");
 
 		let part_1_answer_trimmed = part_1_answer.trim();
 		let part_2_answer_trimmed = part_2_answer.trim();
@@ -113,12 +116,13 @@ fn run(year: u16, day: u8, input: Option<String>, example_only: bool) -> Result<
 		}
 	}
 
-	let file = File::open(input_path).expect("Unable to open file");
-	let reader = BufReader::new(file);
+	let mut file = File::open(input_path).expect("to open input file");
+	let mut buffer = Vec::new();
+	file.read_to_end(&mut buffer).expect("to read input file");
 
 	let now = Instant::now();
 
-	let (part_1, part_2) = solve(reader);
+	let (part_1, part_2) = solve(&buffer);
 
 	let elapsed = now.elapsed();
 

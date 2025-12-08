@@ -1,4 +1,4 @@
-use std::io::{BufRead, Seek};
+use std::io::{BufRead, Read, Seek};
 
 fn part_1(file: &str) -> i32 {
 	let re = regex::Regex::new(r"mul\((\d+),(\d+)\)");
@@ -42,7 +42,8 @@ fn part_2(file: &str) -> i32 {
 	count
 }
 
-pub fn solve<R: BufRead + Seek>(mut reader: R) -> (String, String) {
+pub fn solve(buffer: &[u8]) -> (String, String) {
+	let mut reader = std::io::Cursor::new(buffer);
 	let mut file = String::new();
 	reader.read_to_string(&mut file).unwrap();
 

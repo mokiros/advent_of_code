@@ -7,7 +7,8 @@ const TILES_Y: i64 = 103;
 const TILES_X_HALF: i64 = TILES_X / 2;
 const TILES_Y_HALF: i64 = TILES_Y / 2;
 
-pub fn solve<R: BufRead>(reader: R) -> (String, String) {
+pub fn solve(buffer: &[u8]) -> (String, String) {
+	let mut reader = std::io::Cursor::new(buffer);
 	let re = regex::Regex::new(r"(-?\d+)").unwrap();
 
 	let mut quadrants: [i64; 4] = [0, 0, 0, 0];

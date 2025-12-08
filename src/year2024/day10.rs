@@ -38,7 +38,8 @@ fn read_map<R: BufRead>(reader: &mut R) -> (Matrix<u8>, HashSet<Position>) {
 	)
 }
 
-pub fn solve<R: BufRead + Seek>(mut reader: R) -> (String, String) {
+pub fn solve(buffer: &[u8]) -> (String, String) {
+	let mut reader = std::io::Cursor::new(buffer);
 	let (map, positions) = read_map(&mut reader);
 
 	let mut p1 = 0;

@@ -1,4 +1,4 @@
-use std::io::{BufRead, Seek};
+use std::io::{BufRead, Read, Seek};
 
 fn find_highest<const N: usize>(line: &[u8]) -> u64 {
 	(0..N)
@@ -21,7 +21,8 @@ fn find_highest<const N: usize>(line: &[u8]) -> u64 {
 		.1
 }
 
-pub fn solve<R: BufRead + Seek>(reader: R) -> (String, String) {
+pub fn solve(buffer: &[u8]) -> (String, String) {
+	let mut reader = std::io::Cursor::new(buffer);
 	let mut part1: u64 = 0;
 	let mut part2: u64 = 0;
 

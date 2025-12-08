@@ -125,7 +125,8 @@ fn do_pass(map: &mut Map<Tile>, clear_paper: bool) -> u64 {
 	removed
 }
 
-pub fn solve<R: BufRead + Seek>(reader: R) -> (String, String) {
+pub fn solve(buffer: &[u8]) -> (String, String) {
+	let mut reader = std::io::Cursor::new(buffer);
 	let mut part2: u64 = 0;
 
 	let mut map = Map::read_map(reader, Tile::from);

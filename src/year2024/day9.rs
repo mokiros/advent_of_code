@@ -1,6 +1,7 @@
-use std::io::{BufRead, Seek};
+use std::io::{BufRead, Read, Seek};
 
-pub fn solve<R: BufRead + Seek>(reader: R) -> (String, String) {
+pub fn solve(buffer: &[u8]) -> (String, String) {
+	let mut reader = std::io::Cursor::new(buffer);
 	let mut map: Vec<Option<usize>> = Vec::new();
 
 	for (i, byte) in reader.bytes().enumerate() {
@@ -77,7 +78,10 @@ pub fn solve<R: BufRead + Seek>(reader: R) -> (String, String) {
 		}
 	}
 
-	let p2 = map.iter().enumerate().fold(0, |acc, (i, v)| v.as_ref().map_or(acc, |n| acc + n * i));
+	let p2 = map
+		.iter()
+		.enumerate()
+		.fold(0, |acc, (i, v)| v.as_ref().map_or(acc, |n| acc + n * i));
 
 	(p1.to_string(), p2.to_string())
 }

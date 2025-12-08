@@ -62,7 +62,8 @@ fn calculate_area(
 	(area * edges_num, area * angles)
 }
 
-pub fn solve<R: BufRead + Seek>(reader: R) -> (String, String) {
+pub fn solve(buffer: &[u8]) -> (String, String) {
+	let mut reader = std::io::Cursor::new(buffer);
 	let mut data: Vec<Option<char>> = Vec::new();
 	let mut width: u8 = 0;
 	let mut height: u8 = 0;

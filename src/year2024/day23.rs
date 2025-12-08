@@ -2,7 +2,8 @@ use std::{collections::HashMap, io::BufRead, str::Chars};
 
 use itertools::Itertools;
 
-pub fn solve<R: BufRead>(reader: R) -> (String, String) {
+pub fn solve(buffer: &[u8]) -> (String, String) {
+	let mut reader = std::io::Cursor::new(buffer);
 	type Computer = usize;
 	let tonum = |chars: &mut Chars| {
 		let c1 = chars.next().unwrap() as usize - b'a' as usize;

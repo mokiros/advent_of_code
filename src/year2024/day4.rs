@@ -87,7 +87,8 @@ fn part_2<R: BufRead>(reader: &mut R) -> i32 {
 	count
 }
 
-pub fn solve<R: BufRead + Seek>(mut reader: R) -> (String, String) {
+pub fn solve(buffer: &[u8]) -> (String, String) {
+	let mut reader = std::io::Cursor::new(buffer);
 	let p1 = part_1(&mut reader);
 
 	reader.rewind().expect("Unable to rewind");

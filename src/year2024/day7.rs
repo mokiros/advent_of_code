@@ -69,7 +69,8 @@ fn recursive(numbers: &Vec<i64>, target: i64, operations: &mut [Op; 16], n: u8) 
 	false
 }
 
-pub fn solve<R: BufRead + Seek>(reader: R) -> (String, String) {
+pub fn solve(buffer: &[u8]) -> (String, String) {
+	let mut reader = std::io::Cursor::new(buffer);
 	let mut p1: i64 = 0;
 	let mut p2: i64 = 0;
 

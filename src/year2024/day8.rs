@@ -9,7 +9,8 @@ struct Position {
 	y: i8,
 }
 
-pub fn solve<R: BufRead + Seek>(reader: R) -> (String, String) {
+pub fn solve(buffer: &[u8]) -> (String, String) {
+	let mut reader = std::io::Cursor::new(buffer);
 	let mut width: i8 = 0;
 	let mut height: i8 = 0;
 

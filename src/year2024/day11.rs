@@ -1,6 +1,6 @@
 use std::{
 	collections::HashMap,
-	io::{BufRead, Seek},
+	io::{BufRead, Read, Seek},
 	thread,
 };
 
@@ -44,7 +44,8 @@ fn naive<R: BufRead + Seek>(mut reader: R) -> (String, String) {
 	(p1.to_string(), len.to_string())
 }
 
-pub fn solve<R: BufRead + Seek>(mut reader: R) -> (String, String) {
+pub fn solve(buffer: &[u8]) -> (String, String) {
+	let mut reader = std::io::Cursor::new(buffer);
 	let mut str = String::new();
 	reader.read_to_string(&mut str).unwrap();
 

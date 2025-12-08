@@ -46,7 +46,8 @@ fn bfs(map: &Matrix<u16>, iteration: u16) -> Option<usize> {
 	None
 }
 
-pub fn solve<R: BufRead>(reader: R) -> (String, String) {
+pub fn solve(buffer: &[u8]) -> (String, String) {
+	let mut reader = std::io::Cursor::new(buffer);
 	let mut map: Matrix<u16> =
 		Matrix::new(WIDTH as u8, HEIGHT as u8, vec![u16::MAX; WIDTH * HEIGHT]);
 	let mut bytes = Vec::new();

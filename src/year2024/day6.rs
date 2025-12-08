@@ -70,7 +70,8 @@ fn check_loop(map: &Matrix<MapPart>, mut pos: Position, mut dir: Direction) -> b
 	panic!("loop check: Did not reach the edge of the map");
 }
 
-pub fn solve<R: BufRead + Seek>(mut reader: R) -> (String, String) {
+pub fn solve(buffer: &[u8]) -> (String, String) {
+	let mut reader = std::io::Cursor::new(buffer);
 	let (mut map, mut guard_position) = read_map(&mut reader);
 
 	let mut current_direction = Direction::Up;

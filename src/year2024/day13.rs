@@ -19,7 +19,8 @@ const fn calc(x1: i64, y1: i64, x2: i64, y2: i64, x3: i64, y3: i64) -> Option<i6
 	}
 }
 
-pub fn solve<R: BufRead + Seek>(reader: R) -> (String, String) {
+pub fn solve(buffer: &[u8]) -> (String, String) {
+	let mut reader = std::io::Cursor::new(buffer);
 	let re = regex::Regex::new(r"(\d+)").unwrap();
 	let mut numbers = Vec::with_capacity(6);
 

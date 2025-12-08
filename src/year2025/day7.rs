@@ -1,13 +1,13 @@
-use std::io::{BufRead, Seek};
-
-pub fn solve<R: BufRead + Seek>(reader: R) -> (String, String) {
+pub fn solve(buffer: &[u8]) -> (String, String) {
 	let mut part1: u64 = 0;
 
 	let mut beams = [0_u64; 150];
 
 	let mut x = 1;
-	let mut bytes = reader.bytes();
-	while let Some(Ok(byte)) = bytes.next() {
+	let mut i = 0;
+	while i < buffer.len() {
+		let byte = buffer[i];
+
 		match byte {
 			b'S' => {
 				beams[x] = 1;
@@ -22,7 +22,7 @@ pub fn solve<R: BufRead + Seek>(reader: R) -> (String, String) {
 				}
 			}
 			b'\n' => {
-				bytes.nth(x - 1); // skip every other line
+				i += x; // skip every other line
 				x = 1;
 				continue;
 			}
@@ -31,6 +31,7 @@ pub fn solve<R: BufRead + Seek>(reader: R) -> (String, String) {
 		}
 
 		x += 1;
+		i += 1;
 	}
 
 	let part2: u64 = beams.iter().sum();

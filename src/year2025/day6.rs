@@ -1,6 +1,7 @@
-use std::io::{BufRead, Seek};
+use std::io::{BufRead, Read, Seek};
 
-pub fn solve<R: BufRead + Seek>(mut reader: R) -> (String, String) {
+pub fn solve(buffer: &[u8]) -> (String, String) {
+	let mut reader = std::io::Cursor::new(buffer);
 	let mut part1: u64 = 0;
 	let mut part2: u64 = 0;
 
